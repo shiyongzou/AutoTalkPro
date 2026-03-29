@@ -346,8 +346,9 @@ class ServiceBootstrapper {
     await for (final entity in src.list()) {
       final name = p.basename(entity.path);
       // 跳过大文件
-      if (name == 'node_modules' || name == 'node' || name == 'node.exe')
+      if (name == 'node_modules' || name == 'node' || name == 'node.exe') {
         continue;
+      }
       if (name == 'package-lock.json') continue;
 
       if (entity is File) {

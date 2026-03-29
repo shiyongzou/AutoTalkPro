@@ -86,10 +86,12 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
     setState(() {
       profiles.removeAt(index);
       if (activeIndex == index) activeIndex = null;
-      if (activeIndex != null && activeIndex! > index)
+      if (activeIndex != null && activeIndex! > index) {
         activeIndex = activeIndex! - 1;
-      if (selectedIndex >= profiles.length)
+      }
+      if (selectedIndex >= profiles.length) {
         selectedIndex = profiles.isEmpty ? 0 : profiles.length - 1;
+      }
     });
     _save();
   }
