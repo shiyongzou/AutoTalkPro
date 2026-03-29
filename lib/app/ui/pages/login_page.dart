@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -791,10 +792,11 @@ class _WeChatLoginFormState extends State<_WeChatLoginForm> {
                       fit: BoxFit.contain,
                       child: Text(
                         _qrText!,
-                        style: const TextStyle(
-                          fontFamily: 'Menlo',
+                        style: TextStyle(
+                          fontFamily: Platform.isWindows ? 'Consolas' : 'Menlo',
                           fontSize: 12,
-                          height: 1.1,
+                          height: 1.0,
+                          letterSpacing: 0,
                           color: Colors.black,
                         ),
                       ),
