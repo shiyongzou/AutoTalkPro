@@ -406,7 +406,15 @@ class _TgAiSalesAppState extends State<TgAiSalesApp> {
 
           // 锁屏
           if (_locked && widget.contextOverride == null) {
-            return LockScreen(onUnlock: () => setState(() => _locked = false));
+            return LockScreen(
+              onUnlock: () {
+                setState(() => _locked = false);
+                // 如果锁屏期间登录已失效，持久化登出状态
+                if (!_loggedIn) {
+                  _saveLogin(false);
+                }
+              },
+            );
           }
 
           // 登录页
