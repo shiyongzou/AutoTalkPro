@@ -188,18 +188,33 @@ class MessageBridge {
             finalReply = '@$senderName $replyForSend';
           }
         }
+        // 长消息分段发送（微信单条有长度限制）
+        final segments = _splitMessage(finalReply, 500);
         // ignore: avoid_print
         print(
-          '[MessageBridge] 发送回复: adapter=${adapter.runtimeType} peerId=${raw.peerId} textLen=${finalReply.length}',
+          '[MessageBridge] 发送回复: adapter=${adapter.runtimeType} peerId=${raw.peerId} segments=${segments.length} totalLen=${finalReply.length}',
         );
-        final sent = await adapter.sendMessage(
-          peerId: raw.peerId,
-          text: finalReply,
-        );
-        // ignore: avoid_print
-        print('[MessageBridge] 发送结果: sent=$sent');
+        var allSent = true;
+        for (var i = 0; i < segments.length; i++) {
+          if (i > 0) {
+            // 分段之间间隔 1-2 秒，模拟真人打字
+            await Future<void>.delayed(
+              Duration(
+                milliseconds:
+                    1000 + (segments[i].length * 10).clamp(0, 1000),
+              ),
+            );
+          }
+          final sent = await adapter.sendMessage(
+            peerId: raw.peerId,
+            text: segments[i],
+          );
+          // ignore: avoid_print
+          print('[MessageBridge] 发送段${i + 1}/${segments.length}: sent=$sent');
+          if (!sent) allSent = false;
+        }
 
-        if (sent) {
+        if (allSent) {
           final replyMsg = Message(
             id: 'msg_out_${DateTime.now().microsecondsSinceEpoch}',
             conversationId: conversation.id,
@@ -296,6 +311,33 @@ class MessageBridge {
       default:
         return AutopilotMode.manual;
     }
+  }
+
+  /// 按自然段落分割长消息
+  List<String> _splitMessage(String text, int maxLen) {
+    if (text.length <= maxLen) return [text];
+
+    final segments = <String>[];
+    var remaining = text;
+
+    while (remaining.length > maxLen) {
+      // 优先在段落换行处分割
+      var splitAt = remaining.lastIndexOf('\n\n', maxLen);
+      // 其次在单换行处
+      if (splitAt <= 0) splitAt = remaining.lastIndexOf('\n', maxLen);
+      // 其次在句号处
+      if (splitAt <= 0) splitAt = remaining.lastIndexOf('。', maxLen);
+      // 其次在逗号处
+      if (splitAt <= 0) splitAt = remaining.lastIndexOf('，', maxLen);
+      // 兜底硬截
+      if (splitAt <= 0) splitAt = maxLen;
+
+      segments.add(remaining.substring(0, splitAt + 1).trim());
+      remaining = remaining.substring(splitAt + 1).trim();
+    }
+    if (remaining.isNotEmpty) segments.add(remaining);
+
+    return segments;
   }
 
   String _withEmojiTone(String text, ChannelType channel) {
