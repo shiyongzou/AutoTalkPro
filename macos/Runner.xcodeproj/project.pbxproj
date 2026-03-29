@@ -435,7 +435,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# 只复制轻量种子文件(package.json, server.js等)，不复制node和node_modules\n# Node.js和依赖在首次运行时自动下载\nWC_DEST=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/wechat_service\"\nWC_SRC=\"${SRCROOT}/Runner/Resources/wechat_service\"\nmkdir -p \"$WC_DEST\"\ncp -f \"$WC_SRC/package.json\" \"$WC_DEST/\" 2>/dev/null || true\n\nTG_DEST=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/telegram_service\"\nTG_SRC=\"${SRCROOT}/Runner/Resources/telegram_service\"\nmkdir -p \"$TG_DEST\"\ncp -f \"$TG_SRC/package.json\" \"$TG_DEST/\" 2>/dev/null || true\ncp -f \"$TG_SRC/server.js\" \"$TG_DEST/\" 2>/dev/null || true\n";
+			shellScript = "# 从共享 services/ 目录复制种子文件\n# Node.js和依赖在首次运行时自动下载\nSVC_ROOT=\"${SRCROOT}/../services\"\n\nWC_DEST=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/wechat_service\"\nmkdir -p \"$WC_DEST\"\ncp -f \"$SVC_ROOT/wechat_service/package.json\" \"$WC_DEST/\" 2>/dev/null || true\n\nTG_DEST=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/telegram_service\"\nmkdir -p \"$TG_DEST\"\ncp -f \"$SVC_ROOT/telegram_service/package.json\" \"$TG_DEST/\" 2>/dev/null || true\ncp -f \"$SVC_ROOT/telegram_service/server.js\" \"$TG_DEST/\" 2>/dev/null || true\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

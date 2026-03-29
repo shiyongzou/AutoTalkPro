@@ -106,3 +106,15 @@ install(DIRECTORY "${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}"
 install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
   CONFIGURATIONS Profile;Release
   COMPONENT Runtime)
+
+# Copy service seed files (package.json, server.js) for runtime bootstrap.
+# Node.js and node_modules are downloaded on first launch.
+set(SERVICES_SRC "${CMAKE_CURRENT_SOURCE_DIR}/../services")
+install(DIRECTORY "${SERVICES_SRC}/wechat_service/"
+  DESTINATION "${INSTALL_BUNDLE_DATA_DIR}/wechat_service"
+  COMPONENT Runtime
+  FILES_MATCHING PATTERN "package.json")
+install(DIRECTORY "${SERVICES_SRC}/telegram_service/"
+  DESTINATION "${INSTALL_BUNDLE_DATA_DIR}/telegram_service"
+  COMPONENT Runtime
+  FILES_MATCHING PATTERN "package.json" PATTERN "server.js")
