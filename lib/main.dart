@@ -241,7 +241,12 @@ class _TgAiSalesAppState extends State<TgAiSalesApp> {
           _wechatSubscription = null;
           _wechatHealthTimer?.cancel();
           _wechatHealthTimer = null;
-          _saveLogin(false);
+          // 锁屏状态下不跳登录——等用户解锁后再处理
+          if (_locked) {
+            _loggedIn = false; // 标记，解锁后会看到登录页
+          } else {
+            _saveLogin(false);
+          }
         }
       });
     } else if (channel == LoginChannel.wecom) {
