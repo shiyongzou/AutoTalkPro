@@ -241,12 +241,9 @@ class _TgAiSalesAppState extends State<TgAiSalesApp> {
           _wechatSubscription = null;
           _wechatHealthTimer?.cancel();
           _wechatHealthTimer = null;
-          // 锁屏状态下不跳登录——等用户解锁后再处理
-          if (_locked) {
-            _loggedIn = false; // 标记，解锁后会看到登录页
-          } else {
-            _saveLogin(false);
-          }
+          // 登录失效——解除锁屏，直接跳登录页
+          _locked = false;
+          _saveLogin(false);
         }
       });
     } else if (channel == LoginChannel.wecom) {
@@ -406,15 +403,7 @@ class _TgAiSalesAppState extends State<TgAiSalesApp> {
 
           // 锁屏
           if (_locked && widget.contextOverride == null) {
-            return LockScreen(
-              onUnlock: () {
-                setState(() => _locked = false);
-                // 如果锁屏期间登录已失效，持久化登出状态
-                if (!_loggedIn) {
-                  _saveLogin(false);
-                }
-              },
-            );
+            return LockScreen(onUnlock: () => setState(() => _locked = false));
           }
 
           // 登录页
