@@ -219,14 +219,24 @@ class _TgAiSalesAppState extends State<TgAiSalesApp> {
           );
         }
       });
-      // 微信掉线检测——每30秒检查，掉了直接退出到登录页
+      // 微信掉线检测——延迟60秒后开始，连续3次失败才判定离线
       _wechatHealthTimer?.cancel();
+      var healthFailCount = 0;
       _wechatHealthTimer = Timer.periodic(const Duration(seconds: 30), (
-        _,
+        timer,
       ) async {
         if (!_loggedIn) return;
+        // 前60秒不检测（刚登录，服务可能还在初始化）
+        if (timer.tick <= 2) return;
         final online = await manager.isLoggedIn();
-        if (!online) {
+        if (online) {
+          healthFailCount = 0;
+          return;
+        }
+        healthFailCount++;
+        // ignore: avoid_print
+        print('[BOOT] 微信健康检测失败 ($healthFailCount/3)');
+        if (healthFailCount >= 3) {
           _wechatSubscription?.cancel();
           _wechatSubscription = null;
           _wechatHealthTimer?.cancel();
