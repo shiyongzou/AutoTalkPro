@@ -200,8 +200,7 @@ class MessageBridge {
             // 分段之间间隔 1-2 秒，模拟真人打字
             await Future<void>.delayed(
               Duration(
-                milliseconds:
-                    1000 + (segments[i].length * 10).clamp(0, 1000),
+                milliseconds: 1000 + (segments[i].length * 10).clamp(0, 1000),
               ),
             );
           }
