@@ -53,8 +53,48 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
+
+      # GitHub Release
       - uses: softprops/action-gh-release@v2
         with:
           files: |
             artifacts/AutoTalkPro-macOS/AutoTalkPro-macOS.zip
             artifacts/AutoTalkPro-Windows/AutoTalkPro-Windows.zip
+
+      # Gitee Release（国内下载）
+      - name: Create Gitee Release
+        if: secrets.GITEE_TOKEN != ''
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          # 创建 Gitee Release
+          RELEASE_ID=$(curl -s -X POST "https://gitee.com/api/v5/repos/zoushiyong_admin/AutoTalkPro/releases" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"access_token\": \"${GITEE_TOKEN}\",
+              \"tag_name\": \"${TAG_NAME}\",
+              \"name\": \"${TAG_NAME}\",
+              \"body\": \"AutoTalk Pro ${TAG_NAME}\\n\\n- macOS (Intel/Apple Silicon)\\n- Windows x64\",
+              \"prerelease\": false
+            }" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))")
+
+          echo "Gitee Release ID: $RELEASE_ID"
+
+          if [ -n "$RELEASE_ID" ] && [ "$RELEASE_ID" != "None" ]; then
+            # 上传 macOS 包
+            curl -s -X POST "https://gitee.com/api/v5/repos/zoushiyong_admin/AutoTalkPro/releases/${RELEASE_ID}/attach_files" \
+              -H "Content-Type: multipart/form-data" \
+              -F "access_token=${GITEE_TOKEN}" \
+              -F "file=@artifacts/AutoTalkPro-macOS/AutoTalkPro-macOS.zip"
+
+            # 上传 Windows 包
+            curl -s -X POST "https://gitee.com/api/v5/repos/zoushiyong_admin/AutoTalkPro/releases/${RELEASE_ID}/attach_files" \
+              -H "Content-Type: multipart/form-data" \
+              -F "access_token=${GITEE_TOKEN}" \
+              -F "file=@artifacts/AutoTalkPro-Windows/AutoTalkPro-Windows.zip"
+
+            echo "Gitee Release uploaded successfully"
+          else
+            echo "Gitee Release creation failed, skipping upload"
+          fi
