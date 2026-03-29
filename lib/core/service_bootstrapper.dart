@@ -273,13 +273,28 @@ class ServiceBootstrapper {
     }
 
     // 用自带的npm安装依赖
+    // Windows: 直接运行 npm.cmd（它是批处理脚本，不能被node执行）
+    // macOS/Linux: 用 node 运行 npm-cli.js
+    final String npmExe;
+    final List<String> npmArgs;
+    if (Platform.isWindows) {
+      npmExe = npmPath; // npm.cmd
+      npmArgs = ['install', '--production', '--no-fund', '--no-audit'];
+    } else {
+      // macOS/Linux: npm是个shell脚本，直接执行
+      npmExe = npmPath; // bin/npm
+      npmArgs = ['install', '--production', '--no-fund', '--no-audit'];
+    }
+
+    final pathSep = Platform.isWindows ? ';' : ':';
     final result = await Process.run(
-      nodePath,
-      [npmPath, 'install', '--production', '--no-fund', '--no-audit'],
+      npmExe,
+      npmArgs,
       workingDirectory: targetDir.path,
+      runInShell: Platform.isWindows, // Windows上npm.cmd需要shell执行
       environment: {
         ...Platform.environment,
-        'PATH': '${p.dirname(nodePath)}:${Platform.environment['PATH'] ?? ''}',
+        'PATH': '${p.dirname(nodePath)}$pathSep${Platform.environment['PATH'] ?? ''}',
       },
     );
 
