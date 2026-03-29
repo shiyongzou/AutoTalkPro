@@ -146,6 +146,22 @@ void main() {
       channelManager: manager,
     );
 
+    // 先创建会话并设为auto模式（默认是manual不会自动发送）
+    final now = DateTime.now();
+    await app.conversationRepository.upsertConversation(
+      Conversation(
+        id: 'conv_test_wecom',
+        customerId: 'u_wecom_1',
+        title: '企业客户A',
+        status: 'active',
+        goalStage: 'discover',
+        lastMessageAt: now,
+        createdAt: now,
+        updatedAt: now,
+        autopilotMode: 'auto',
+      ),
+    );
+
     await bridge.handleIncoming(
       IncomingRawMessage(
         channel: ChannelType.wecom,

@@ -58,7 +58,8 @@ void main() {
       final msg = await future;
       expect(msg.isText, true);
       expect(msg.isPrivate, true);
-      expect(msg.fromId, 'wx_u_1');
+      // fromId now uses alias > name > id for wechatbot-webhook compatibility
+      expect(msg.fromId, 'Alice');
       expect(msg.fromName, 'Alice');
       expect(msg.content, '你好');
     });
