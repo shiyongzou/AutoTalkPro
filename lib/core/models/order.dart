@@ -1,11 +1,11 @@
 enum OrderStatus {
-  pending,     // 待确认
-  confirmed,   // 已确认，等待付款
-  paid,        // 已付款，待交付
-  delivered,   // 已交付
-  completed,   // 完成
-  cancelled,   // 取消
-  refunded,    // 退款
+  pending, // 待确认
+  confirmed, // 已确认，等待付款
+  paid, // 已付款，待交付
+  delivered, // 已交付
+  completed, // 完成
+  cancelled, // 取消
+  refunded, // 退款
 }
 
 class OrderItem {
@@ -69,9 +69,9 @@ class Order {
   final double totalAmount;
   final String currency;
   final OrderStatus status;
-  final String? paymentMethod;  // '微信', '支付宝', 'USDT', '银行转账'
+  final String? paymentMethod; // '微信', '支付宝', 'USDT', '银行转账'
   final String? deliveryMethod; // '网盘链接', '微信发送', '邮件', '快递'
-  final String? deliveryInfo;   // 交付详情（如网盘链接）
+  final String? deliveryInfo; // 交付详情（如网盘链接）
   final String? notes;
   final DateTime? paidAt;
   final DateTime? deliveredAt;
@@ -111,18 +111,29 @@ class Order {
     );
   }
 
-  bool get isPending => status == OrderStatus.pending || status == OrderStatus.confirmed;
-  bool get isActive => status != OrderStatus.cancelled && status != OrderStatus.refunded && status != OrderStatus.completed;
+  bool get isPending =>
+      status == OrderStatus.pending || status == OrderStatus.confirmed;
+  bool get isActive =>
+      status != OrderStatus.cancelled &&
+      status != OrderStatus.refunded &&
+      status != OrderStatus.completed;
 
   String get statusLabel {
     switch (status) {
-      case OrderStatus.pending: return '待确认';
-      case OrderStatus.confirmed: return '待付款';
-      case OrderStatus.paid: return '待交付';
-      case OrderStatus.delivered: return '已交付';
-      case OrderStatus.completed: return '已完成';
-      case OrderStatus.cancelled: return '已取消';
-      case OrderStatus.refunded: return '已退款';
+      case OrderStatus.pending:
+        return '待确认';
+      case OrderStatus.confirmed:
+        return '待付款';
+      case OrderStatus.paid:
+        return '待交付';
+      case OrderStatus.delivered:
+        return '已交付';
+      case OrderStatus.completed:
+        return '已完成';
+      case OrderStatus.cancelled:
+        return '已取消';
+      case OrderStatus.refunded:
+        return '已退款';
     }
   }
 }

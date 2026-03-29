@@ -40,13 +40,16 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
     _loadPlatformKeys();
     // 监听新消息自动刷新（防抖：500ms内多次触发只执行一次）
     Timer? debounce;
-    _bridgeSubscription = widget.appContext.messageBridge.processed.listen((event) {
+    _bridgeSubscription = widget.appContext.messageBridge.processed.listen((
+      event,
+    ) {
       if (!mounted) return;
       debounce?.cancel();
       debounce = Timer(const Duration(milliseconds: 500), () {
         if (!mounted) return;
         _load();
-        if (selectedConversation != null && event.conversation.id == selectedConversation!.id) {
+        if (selectedConversation != null &&
+            event.conversation.id == selectedConversation!.id) {
           _refreshCurrentChat();
           // 手动模式：AI回复塞到输入框
           if (event.result != null &&
@@ -75,7 +78,10 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
         title: const Text('清空聊天记录'),
         content: Text('确定要清空「${selectedConversation!.title}」的所有消息吗？'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('取消')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('取消'),
+          ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -100,7 +106,10 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
         title: const Text('清空所有会话'),
         content: const Text('确定要删除所有会话和消息记录吗？此操作不可恢复。'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('取消')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('取消'),
+          ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -124,7 +133,10 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
 
   Future<void> _toggleAutoReply(Conversation c) async {
     final newMode = c.autopilotMode == 'manual' ? 'auto' : 'manual';
-    final updated = c.copyWith(autopilotMode: newMode, updatedAt: DateTime.now());
+    final updated = c.copyWith(
+      autopilotMode: newMode,
+      updatedAt: DateTime.now(),
+    );
     await widget.appContext.conversationRepository.upsertConversation(updated);
     await _load();
     if (selectedConversation?.id == c.id) {
@@ -135,7 +147,9 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
   Future<void> _refreshCurrentChat() async {
     if (selectedConversation == null) return;
     final targetId = selectedConversation!.id;
-    final messages = await widget.appContext.messageRepository.listMessages(targetId);
+    final messages = await widget.appContext.messageRepository.listMessages(
+      targetId,
+    );
     if (!mounted || selectedConversation?.id != targetId) return;
     setState(() => currentMessages = messages);
     _scrollToBottom();
@@ -150,8 +164,11 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
 
   Future<void> _persistAutopilotMode(AutopilotMode mode) async {
     if (selectedConversation == null) return;
-    final modeStr = mode == AutopilotMode.auto ? 'auto'
-        : mode == AutopilotMode.semiAuto ? 'semiAuto' : 'manual';
+    final modeStr = mode == AutopilotMode.auto
+        ? 'auto'
+        : mode == AutopilotMode.semiAuto
+        ? 'semiAuto'
+        : 'manual';
     final updated = selectedConversation!.copyWith(
       autopilotMode: modeStr,
       updatedAt: DateTime.now(),
@@ -185,7 +202,9 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
 
   /// 切换到指定平台的指定模型
   Future<void> _switchToModel(String platformId, String model) async {
-    final platform = AiProviderSettings.platforms.firstWhere((p) => p.id == platformId);
+    final platform = AiProviderSettings.platforms.firstWhere(
+      (p) => p.id == platformId,
+    );
     final prefs = await SharedPreferences.getInstance();
     final apiKey = prefs.getString('ai.apiKey.$platformId');
 
@@ -217,15 +236,21 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
       lastAutopilotResult = null;
     });
 
-    final messages = await widget.appContext.messageRepository.listMessages(targetId);
-    final neg = await widget.appContext.negotiationRepository.getByConversation(targetId);
+    final messages = await widget.appContext.messageRepository.listMessages(
+      targetId,
+    );
+    final neg = await widget.appContext.negotiationRepository.getByConversation(
+      targetId,
+    );
 
     if (!mounted) return;
     // 关键：如果用户已经切到别的会话，丢弃这次结果
     if (_selectVersion != version) return;
 
-    final loadedMode = c.autopilotMode == 'auto' ? AutopilotMode.auto
-        : c.autopilotMode == 'semiAuto' ? AutopilotMode.semiAuto
+    final loadedMode = c.autopilotMode == 'auto'
+        ? AutopilotMode.auto
+        : c.autopilotMode == 'semiAuto'
+        ? AutopilotMode.semiAuto
         : AutopilotMode.manual;
     setState(() {
       selectedConversation = c;
@@ -237,9 +262,6 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
     _scrollToBottom();
   }
 
-
-
-
   Future<void> _sendReply(String content) async {
     if (selectedConversation == null || content.trim().isEmpty) return;
     final targetId = selectedConversation!.id;
@@ -248,7 +270,10 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
     // Actually send to the channel (WeChat/Telegram/WeCom)
     final channelManager = widget.appContext.channelManager;
     final adapter = channelManager.activeAdapter;
-    final sent = await adapter.sendMessage(peerId: customerId, text: content.trim());
+    final sent = await adapter.sendMessage(
+      peerId: customerId,
+      text: content.trim(),
+    );
 
     final msg = Message(
       id: 'msg_ai_${DateTime.now().microsecondsSinceEpoch}',
@@ -261,7 +286,9 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
     );
     await widget.appContext.messageRepository.addMessage(msg);
 
-    final messages = await widget.appContext.messageRepository.listMessages(targetId);
+    final messages = await widget.appContext.messageRepository.listMessages(
+      targetId,
+    );
     if (!mounted) return;
     // 只在仍选中同一会话时更新UI
     if (selectedConversation?.id != targetId) return;
@@ -309,7 +336,10 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
                   padding: EdgeInsets.all(tokens.spaceMd),
                   child: Row(
                     children: [
-                      Text('会话列表', style: Theme.of(context).textTheme.titleSmall),
+                      Text(
+                        '会话列表',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
                       const Spacer(),
                       IconButton(
                         icon: const Icon(Icons.delete_sweep, size: 20),
@@ -326,7 +356,9 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
                 ),
                 Expanded(
                   child: conversations.isEmpty
-                      ? const Center(child: Text('暂无会话', style: TextStyle(fontSize: 12)))
+                      ? const Center(
+                          child: Text('暂无会话', style: TextStyle(fontSize: 12)),
+                        )
                       : ListView.builder(
                           itemCount: conversations.length,
                           itemBuilder: (context, index) {
@@ -336,25 +368,40 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
                             return ListTile(
                               dense: true,
                               selected: isSelected,
-                              selectedTileColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                              selectedTileColor: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer
+                                  .withValues(alpha: 0.3),
                               leading: Icon(
                                 Icons.forum_outlined,
                                 size: 18,
-                                color: isSelected ? Theme.of(context).colorScheme.primary : null,
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : null,
                               ),
-                              title: Text(c.title, style: const TextStyle(fontSize: 13)),
+                              title: Text(
+                                c.title,
+                                style: const TextStyle(fontSize: 13),
+                              ),
                               subtitle: Text(
                                 isAutoReply ? '自动回复已开启' : '自动回复关闭',
-                                style: TextStyle(fontSize: 11, color: isAutoReply ? Colors.green : null),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: isAutoReply ? Colors.green : null,
+                                ),
                               ),
                               trailing: Tooltip(
                                 message: isAutoReply ? '点击关闭自动回复' : '点击开启自动回复',
                                 child: GestureDetector(
                                   onTap: () => _toggleAutoReply(c),
                                   child: Icon(
-                                    isAutoReply ? Icons.smart_toy : Icons.smart_toy_outlined,
+                                    isAutoReply
+                                        ? Icons.smart_toy
+                                        : Icons.smart_toy_outlined,
                                     size: 18,
-                                    color: isAutoReply ? Colors.green : Colors.grey,
+                                    color: isAutoReply
+                                        ? Colors.green
+                                        : Colors.grey,
                                   ),
                                 ),
                               ),
@@ -373,9 +420,7 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
         Expanded(
           flex: 3,
           child: selectedConversation == null
-              ? const AppSurfaceCard(
-                  child: Center(child: Text('选择一个会话开始对话')),
-                )
+              ? const AppSurfaceCard(child: Center(child: Text('选择一个会话开始对话')))
               : AppSurfaceCard(
                   child: Column(
                     children: [
@@ -397,7 +442,10 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
 
   Widget _buildChatHeader(BuildContext context, AppThemeTokens tokens) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: tokens.spaceMd, vertical: tokens.spaceSm),
+      padding: EdgeInsets.symmetric(
+        horizontal: tokens.spaceMd,
+        vertical: tokens.spaceSm,
+      ),
       child: Row(
         children: [
           Expanded(
@@ -418,13 +466,24 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.3),
+                ),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(_currentModelName(), style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600)),
+                  Text(
+                    _currentModelName(),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   const SizedBox(width: 4),
                   const Icon(Icons.arrow_drop_down, size: 16),
                 ],
@@ -434,36 +493,68 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
               final items = <PopupMenuEntry<String>>[];
               for (final platform in AiProviderSettings.platforms) {
                 // 平台标题
-                items.add(PopupMenuItem(
-                  enabled: false,
-                  height: 28,
-                  child: Text(platform.label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary)),
-                ));
+                items.add(
+                  PopupMenuItem(
+                    enabled: false,
+                    height: 28,
+                    child: Text(
+                      platform.label,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                );
                 // 该平台下的模型
                 final hasKey = _platformHasKey(platform.id);
                 for (final model in platform.models) {
                   final isCurrent = model == _currentModelName();
-                  items.add(PopupMenuItem(
-                    value: hasKey ? '${platform.id}|$model' : null,
-                    enabled: hasKey,
-                    height: 32,
-                    child: Row(
-                      children: [
-                        if (isCurrent) Icon(Icons.check, size: 14, color: Theme.of(context).colorScheme.primary)
-                        else const SizedBox(width: 14),
-                        const SizedBox(width: 6),
-                        Text(model, style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: isCurrent ? FontWeight.w600 : FontWeight.normal,
-                          color: !hasKey ? Colors.grey : isCurrent ? Theme.of(context).colorScheme.primary : null,
-                        )),
-                        if (!hasKey) ...[
+                  items.add(
+                    PopupMenuItem(
+                      value: hasKey ? '${platform.id}|$model' : null,
+                      enabled: hasKey,
+                      height: 32,
+                      child: Row(
+                        children: [
+                          if (isCurrent)
+                            Icon(
+                              Icons.check,
+                              size: 14,
+                              color: Theme.of(context).colorScheme.primary,
+                            )
+                          else
+                            const SizedBox(width: 14),
                           const SizedBox(width: 6),
-                          Text('未配Key', style: TextStyle(fontSize: 9, color: Colors.grey.shade400)),
+                          Text(
+                            model,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: isCurrent
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
+                              color: !hasKey
+                                  ? Colors.grey
+                                  : isCurrent
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null,
+                            ),
+                          ),
+                          if (!hasKey) ...[
+                            const SizedBox(width: 6),
+                            Text(
+                              '未配Key',
+                              style: TextStyle(
+                                fontSize: 9,
+                                color: Colors.grey.shade400,
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
-                  ));
+                  );
                 }
                 items.add(const PopupMenuDivider(height: 4));
               }
@@ -480,35 +571,44 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
           // Autopilot模式选择
           Flexible(
             child: SegmentedButton<AutopilotMode>(
-            segments: const [
-              ButtonSegment(
-                value: AutopilotMode.manual,
-                label: Tooltip(message: 'AI生成回复草稿，你审核后手动发送', child: Text('手动', style: TextStyle(fontSize: 11))),
-                icon: Icon(Icons.person, size: 14),
-              ),
-              ButtonSegment(
-                value: AutopilotMode.semiAuto,
-                label: Tooltip(message: 'AI置信度高时自动发送，不确定时暂停等你确认', child: Text('半自动', style: TextStyle(fontSize: 11))),
-                icon: Icon(Icons.auto_fix_high, size: 14),
-              ),
-              ButtonSegment(
-                value: AutopilotMode.auto,
-                label: Tooltip(message: 'AI全自动回复，遇到风险或复杂问题才提醒你', child: Text('全自动', style: TextStyle(fontSize: 11))),
-                icon: Icon(Icons.smart_toy, size: 14),
-              ),
-            ],
-            selected: {autopilotMode},
-            onSelectionChanged: (modes) {
-              setState(() => autopilotMode = modes.first);
-              _persistAutopilotMode(modes.first);
-            },
-            style: ButtonStyle(
-              visualDensity: VisualDensity.compact,
-              textStyle: WidgetStatePropertyAll(
-                Theme.of(context).textTheme.labelSmall,
+              segments: const [
+                ButtonSegment(
+                  value: AutopilotMode.manual,
+                  label: Tooltip(
+                    message: 'AI生成回复草稿，你审核后手动发送',
+                    child: Text('手动', style: TextStyle(fontSize: 11)),
+                  ),
+                  icon: Icon(Icons.person, size: 14),
+                ),
+                ButtonSegment(
+                  value: AutopilotMode.semiAuto,
+                  label: Tooltip(
+                    message: 'AI置信度高时自动发送，不确定时暂停等你确认',
+                    child: Text('半自动', style: TextStyle(fontSize: 11)),
+                  ),
+                  icon: Icon(Icons.auto_fix_high, size: 14),
+                ),
+                ButtonSegment(
+                  value: AutopilotMode.auto,
+                  label: Tooltip(
+                    message: 'AI全自动回复，遇到风险或复杂问题才提醒你',
+                    child: Text('全自动', style: TextStyle(fontSize: 11)),
+                  ),
+                  icon: Icon(Icons.smart_toy, size: 14),
+                ),
+              ],
+              selected: {autopilotMode},
+              onSelectionChanged: (modes) {
+                setState(() => autopilotMode = modes.first);
+                _persistAutopilotMode(modes.first);
+              },
+              style: ButtonStyle(
+                visualDensity: VisualDensity.compact,
+                textStyle: WidgetStatePropertyAll(
+                  Theme.of(context).textTheme.labelSmall,
+                ),
               ),
             ),
-          ),
           ),
         ],
       ),
@@ -526,9 +626,16 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
             padding: EdgeInsets.symmetric(vertical: tokens.spaceSm),
             child: const Row(
               children: [
-                SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
                 SizedBox(width: 8),
-                Text('AI正在思考...', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                Text(
+                  'AI正在思考...',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
               ],
             ),
           );
@@ -540,14 +647,20 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
         return Padding(
           padding: EdgeInsets.only(bottom: tokens.spaceSm),
           child: Row(
-            mainAxisAlignment: isCustomer ? MainAxisAlignment.start : MainAxisAlignment.end,
+            mainAxisAlignment: isCustomer
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (isCustomer) ...[
                 CircleAvatar(
                   radius: 16,
                   backgroundColor: Colors.orange.shade100,
-                  child: const Icon(Icons.person, size: 16, color: Colors.orange),
+                  child: const Icon(
+                    Icons.person,
+                    size: 16,
+                    color: Colors.orange,
+                  ),
                 ),
                 const SizedBox(width: 8),
               ],
@@ -569,7 +682,9 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
                           fontSize: 13,
                           color: isCustomer
                               ? Theme.of(context).colorScheme.onSurface
-                              : Theme.of(context).colorScheme.onPrimaryContainer,
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onPrimaryContainer,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -577,7 +692,9 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
                         '${msg.sentAt.hour.toString().padLeft(2, '0')}:${msg.sentAt.minute.toString().padLeft(2, '0')}',
                         style: TextStyle(
                           fontSize: 10,
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
                       ),
                     ],
@@ -589,7 +706,11 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
                 CircleAvatar(
                   radius: 16,
                   backgroundColor: Colors.blue.shade100,
-                  child: const Icon(Icons.smart_toy, size: 16, color: Colors.blue),
+                  child: const Icon(
+                    Icons.smart_toy,
+                    size: 16,
+                    color: Colors.blue,
+                  ),
                 ),
               ],
             ],
@@ -606,20 +727,29 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // AI建议回复
-          if (lastAutopilotResult != null && lastAutopilotResult!.reply.content.isNotEmpty) ...[
+          if (lastAutopilotResult != null &&
+              lastAutopilotResult!.reply.content.isNotEmpty) ...[
             Container(
               padding: EdgeInsets.all(tokens.spaceSm),
               margin: EdgeInsets.only(bottom: tokens.spaceSm),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.tertiaryContainer.withValues(alpha: 0.3),
+                color: Theme.of(
+                  context,
+                ).colorScheme.tertiaryContainer.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.tertiary.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.auto_awesome, size: 14, color: Theme.of(context).colorScheme.tertiary),
+                  Icon(
+                    Icons.auto_awesome,
+                    size: 14,
+                    color: Theme.of(context).colorScheme.tertiary,
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -642,14 +772,16 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
                   IconButton(
                     icon: const Icon(Icons.send, size: 16),
                     tooltip: '采纳并发送',
-                    onPressed: () => _sendReply(lastAutopilotResult!.reply.content),
+                    onPressed: () =>
+                        _sendReply(lastAutopilotResult!.reply.content),
                     visualDensity: VisualDensity.compact,
                   ),
                   IconButton(
                     icon: const Icon(Icons.edit, size: 16),
                     tooltip: '编辑后发送',
                     onPressed: () {
-                      _inputController.text = lastAutopilotResult!.reply.content;
+                      _inputController.text =
+                          lastAutopilotResult!.reply.content;
                     },
                     visualDensity: VisualDensity.compact,
                   ),
@@ -664,23 +796,26 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxHeight: 120),
                   child: TextField(
-                  controller: _inputController,
-                  maxLines: null,
-                  minLines: 1,
-                  keyboardType: TextInputType.multiline,
-                  textInputAction: TextInputAction.newline,
-                  decoration: InputDecoration(
-                    hintText: '输入消息，Enter换行，点发送按钮发出',
-                    hintStyle: const TextStyle(fontSize: 13),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                    controller: _inputController,
+                    maxLines: null,
+                    minLines: 1,
+                    keyboardType: TextInputType.multiline,
+                    textInputAction: TextInputAction.newline,
+                    decoration: InputDecoration(
+                      hintText: '输入消息，Enter换行，点发送按钮发出',
+                      hintStyle: const TextStyle(fontSize: 13),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      isDense: true,
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    isDense: true,
+                    style: const TextStyle(fontSize: 13),
+                    scrollPhysics: const ClampingScrollPhysics(),
                   ),
-                  style: const TextStyle(fontSize: 13),
-                  scrollPhysics: const ClampingScrollPhysics(),
-                ),
                 ),
               ),
               const SizedBox(width: 8),
@@ -689,7 +824,10 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
                 icon: const Icon(Icons.send, size: 16),
                 label: const Text('发送', style: TextStyle(fontSize: 12)),
                 style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
               ),
             ],
@@ -698,5 +836,4 @@ class _ConversationCenterPageState extends State<ConversationCenterPage> {
       ),
     );
   }
-
 }

@@ -43,12 +43,15 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
     var result = customers;
     if (searchQuery.isNotEmpty) {
       final q = searchQuery.toLowerCase();
-      result = result.where((c) =>
-        c.name.toLowerCase().contains(q) ||
-        (c.company?.toLowerCase().contains(q) ?? false) ||
-        (c.email?.toLowerCase().contains(q) ?? false) ||
-        (c.phone?.contains(q) ?? false)
-      ).toList();
+      result = result
+          .where(
+            (c) =>
+                c.name.toLowerCase().contains(q) ||
+                (c.company?.toLowerCase().contains(q) ?? false) ||
+                (c.email?.toLowerCase().contains(q) ?? false) ||
+                (c.phone?.contains(q) ?? false),
+          )
+          .toList();
     }
     if (filterSegment != 'all') {
       result = result.where((c) => c.segment == filterSegment).toList();
@@ -79,26 +82,65 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextField(controller: nameCtl, decoration: const InputDecoration(labelText: '姓名 *', border: OutlineInputBorder())),
+                  TextField(
+                    controller: nameCtl,
+                    decoration: const InputDecoration(
+                      labelText: '姓名 *',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
                   const SizedBox(height: 12),
-                  TextField(controller: companyCtl, decoration: const InputDecoration(labelText: '公司', border: OutlineInputBorder())),
+                  TextField(
+                    controller: companyCtl,
+                    decoration: const InputDecoration(
+                      labelText: '公司',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Expanded(child: TextField(controller: emailCtl, decoration: const InputDecoration(labelText: '邮箱', border: OutlineInputBorder()))),
+                      Expanded(
+                        child: TextField(
+                          controller: emailCtl,
+                          decoration: const InputDecoration(
+                            labelText: '邮箱',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 12),
-                      Expanded(child: TextField(controller: phoneCtl, decoration: const InputDecoration(labelText: '电话', border: OutlineInputBorder()))),
+                      Expanded(
+                        child: TextField(
+                          controller: phoneCtl,
+                          decoration: const InputDecoration(
+                            labelText: '电话',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Expanded(child: TextField(controller: industryCtl, decoration: const InputDecoration(labelText: '行业', border: OutlineInputBorder()))),
+                      Expanded(
+                        child: TextField(
+                          controller: industryCtl,
+                          decoration: const InputDecoration(
+                            labelText: '行业',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: DropdownButtonFormField<String>(
                           initialValue: segment,
-                          decoration: const InputDecoration(labelText: '意向度', border: OutlineInputBorder()),
+                          decoration: const InputDecoration(
+                            labelText: '意向度',
+                            border: OutlineInputBorder(),
+                          ),
                           items: const [
                             DropdownMenuItem(value: '高意向', child: Text('高意向')),
                             DropdownMenuItem(value: '中意向', child: Text('中意向')),
@@ -106,7 +148,9 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
                             DropdownMenuItem(value: '已成交', child: Text('已成交')),
                             DropdownMenuItem(value: '已流失', child: Text('已流失')),
                           ],
-                          onChanged: (v) { if (v != null) setFormState(() => segment = v); },
+                          onChanged: (v) {
+                            if (v != null) setFormState(() => segment = v);
+                          },
                         ),
                       ),
                     ],
@@ -117,29 +161,54 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
                       Expanded(
                         child: DropdownButtonFormField<String>(
                           initialValue: lifeCycle,
-                          decoration: const InputDecoration(labelText: '生命周期', border: OutlineInputBorder()),
+                          decoration: const InputDecoration(
+                            labelText: '生命周期',
+                            border: OutlineInputBorder(),
+                          ),
                           items: const [
                             DropdownMenuItem(value: 'lead', child: Text('线索')),
-                            DropdownMenuItem(value: 'prospect', child: Text('意向')),
-                            DropdownMenuItem(value: 'opportunity', child: Text('商机')),
-                            DropdownMenuItem(value: 'customer', child: Text('客户')),
-                            DropdownMenuItem(value: 'churned', child: Text('流失')),
+                            DropdownMenuItem(
+                              value: 'prospect',
+                              child: Text('意向'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'opportunity',
+                              child: Text('商机'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'customer',
+                              child: Text('客户'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'churned',
+                              child: Text('流失'),
+                            ),
                           ],
-                          onChanged: (v) { if (v != null) setFormState(() => lifeCycle = v); },
+                          onChanged: (v) {
+                            if (v != null) setFormState(() => lifeCycle = v);
+                          },
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: DropdownButtonFormField<String>(
                           initialValue: budgetLevel,
-                          decoration: const InputDecoration(labelText: '预算等级', border: OutlineInputBorder()),
+                          decoration: const InputDecoration(
+                            labelText: '预算等级',
+                            border: OutlineInputBorder(),
+                          ),
                           items: const [
                             DropdownMenuItem(value: 'low', child: Text('低')),
                             DropdownMenuItem(value: 'medium', child: Text('中')),
                             DropdownMenuItem(value: 'high', child: Text('高')),
-                            DropdownMenuItem(value: 'enterprise', child: Text('企业级')),
+                            DropdownMenuItem(
+                              value: 'enterprise',
+                              child: Text('企业级'),
+                            ),
                           ],
-                          onChanged: (v) { if (v != null) setFormState(() => budgetLevel = v); },
+                          onChanged: (v) {
+                            if (v != null) setFormState(() => budgetLevel = v);
+                          },
                         ),
                       ),
                     ],
@@ -148,13 +217,17 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
                   CheckboxListTile(
                     title: const Text('决策人'),
                     value: isDecisionMaker,
-                    onChanged: (v) => setFormState(() => isDecisionMaker = v ?? false),
+                    onChanged: (v) =>
+                        setFormState(() => isDecisionMaker = v ?? false),
                     controlAffinity: ListTileControlAffinity.leading,
                     contentPadding: EdgeInsets.zero,
                   ),
                   TextField(
                     controller: notesCtl,
-                    decoration: const InputDecoration(labelText: '备注', border: OutlineInputBorder()),
+                    decoration: const InputDecoration(
+                      labelText: '备注',
+                      border: OutlineInputBorder(),
+                    ),
                     maxLines: 3,
                   ),
                 ],
@@ -162,13 +235,16 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('取消')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('取消'),
+            ),
             FilledButton(
               onPressed: () {
                 if (nameCtl.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(
-                    const SnackBar(content: Text('姓名不能为空')),
-                  );
+                  ScaffoldMessenger.of(
+                    ctx,
+                  ).showSnackBar(const SnackBar(content: Text('姓名不能为空')));
                   return;
                 }
                 Navigator.pop(ctx, true);
@@ -194,7 +270,9 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
       company: companyCtl.text.trim().isEmpty ? null : companyCtl.text.trim(),
       email: emailCtl.text.trim().isEmpty ? null : emailCtl.text.trim(),
       phone: phoneCtl.text.trim().isEmpty ? null : phoneCtl.text.trim(),
-      industry: industryCtl.text.trim().isEmpty ? null : industryCtl.text.trim(),
+      industry: industryCtl.text.trim().isEmpty
+          ? null
+          : industryCtl.text.trim(),
       budgetLevel: budgetLevel,
       isDecisionMaker: isDecisionMaker,
       lifeCycleStage: lifeCycle,
@@ -217,7 +295,10 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
     final filtered = filteredCustomers;
     final highIntent = customers.where((c) => c.segment == '高意向').length;
     final decisionMakers = customers.where((c) => c.isDecisionMaker).length;
-    final totalRevenue = customers.fold<double>(0, (s, c) => s + c.totalRevenue);
+    final totalRevenue = customers.fold<double>(
+      0,
+      (s, c) => s + c.totalRevenue,
+    );
 
     return Row(
       children: [
@@ -234,7 +315,10 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
                     children: [
                       Row(
                         children: [
-                          Text('客户中心', style: Theme.of(context).textTheme.titleSmall),
+                          Text(
+                            '客户中心',
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
                           const Spacer(),
                           IconButton(
                             icon: const Icon(Icons.person_add, size: 20),
@@ -253,9 +337,14 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
                         decoration: InputDecoration(
                           hintText: '搜索客户...',
                           prefixIcon: const Icon(Icons.search, size: 18),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                           isDense: true,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                         ),
                         style: const TextStyle(fontSize: 13),
                         onChanged: (v) => setState(() => searchQuery = v),
@@ -265,13 +354,24 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           children: [
-                            for (final seg in ['all', '高意向', '中意向', '低意向', '已成交', '已流失'])
+                            for (final seg in [
+                              'all',
+                              '高意向',
+                              '中意向',
+                              '低意向',
+                              '已成交',
+                              '已流失',
+                            ])
                               Padding(
                                 padding: const EdgeInsets.only(right: 4),
                                 child: FilterChip(
-                                  label: Text(seg == 'all' ? '全部' : seg, style: const TextStyle(fontSize: 11)),
+                                  label: Text(
+                                    seg == 'all' ? '全部' : seg,
+                                    style: const TextStyle(fontSize: 11),
+                                  ),
                                   selected: filterSegment == seg,
-                                  onSelected: (_) => setState(() => filterSegment = seg),
+                                  onSelected: (_) =>
+                                      setState(() => filterSegment = seg),
                                   visualDensity: VisualDensity.compact,
                                 ),
                               ),
@@ -289,16 +389,30 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
                     runSpacing: tokens.spaceSm,
                     children: [
                       _MiniMetric(label: '总数', value: '${customers.length}'),
-                      _MiniMetric(label: '高意向', value: '$highIntent', color: Colors.green),
-                      _MiniMetric(label: '决策人', value: '$decisionMakers', color: Colors.blue),
-                      _MiniMetric(label: '总营收', value: '¥${totalRevenue.toStringAsFixed(0)}', color: Colors.orange),
+                      _MiniMetric(
+                        label: '高意向',
+                        value: '$highIntent',
+                        color: Colors.green,
+                      ),
+                      _MiniMetric(
+                        label: '决策人',
+                        value: '$decisionMakers',
+                        color: Colors.blue,
+                      ),
+                      _MiniMetric(
+                        label: '总营收',
+                        value: '¥${totalRevenue.toStringAsFixed(0)}',
+                        color: Colors.orange,
+                      ),
                     ],
                   ),
                 ),
                 SizedBox(height: tokens.spaceSm),
                 Expanded(
                   child: filtered.isEmpty
-                      ? const Center(child: Text('暂无客户', style: TextStyle(fontSize: 12)))
+                      ? const Center(
+                          child: Text('暂无客户', style: TextStyle(fontSize: 12)),
+                        )
                       : ListView.builder(
                           itemCount: filtered.length,
                           itemBuilder: (context, index) {
@@ -307,26 +421,44 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
                             return ListTile(
                               dense: true,
                               selected: isSelected,
-                              selectedTileColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                              selectedTileColor: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer
+                                  .withValues(alpha: 0.3),
                               leading: CircleAvatar(
                                 radius: 16,
-                                backgroundColor: _segmentColor(c.segment).withValues(alpha: 0.2),
+                                backgroundColor: _segmentColor(
+                                  c.segment,
+                                ).withValues(alpha: 0.2),
                                 child: Text(
                                   c.name.isNotEmpty ? c.name[0] : '?',
-                                  style: TextStyle(fontSize: 12, color: _segmentColor(c.segment)),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: _segmentColor(c.segment),
+                                  ),
                                 ),
                               ),
                               title: Row(
                                 children: [
                                   Expanded(
-                                    child: Text(c.name, style: const TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis),
+                                    child: Text(
+                                      c.name,
+                                      style: const TextStyle(fontSize: 13),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                   if (c.isDecisionMaker)
-                                    Icon(Icons.verified, size: 14, color: Colors.blue.shade400),
+                                    Icon(
+                                      Icons.verified,
+                                      size: 14,
+                                      color: Colors.blue.shade400,
+                                    ),
                                 ],
                               ),
                               subtitle: Text(
-                                [c.company, c.segment].where((s) => s != null && s.isNotEmpty).join(' · '),
+                                [c.company, c.segment]
+                                    .where((s) => s != null && s.isNotEmpty)
+                                    .join(' · '),
                                 style: const TextStyle(fontSize: 11),
                               ),
                               onTap: () => setState(() => selectedCustomer = c),
@@ -347,7 +479,11 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
               : AppSurfaceCard(
                   child: SingleChildScrollView(
                     padding: EdgeInsets.all(tokens.spaceLg),
-                    child: _buildCustomerDetail(context, tokens, selectedCustomer!),
+                    child: _buildCustomerDetail(
+                      context,
+                      tokens,
+                      selectedCustomer!,
+                    ),
                   ),
                 ),
         ),
@@ -355,7 +491,11 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
     );
   }
 
-  Widget _buildCustomerDetail(BuildContext context, AppThemeTokens tokens, CustomerProfile c) {
+  Widget _buildCustomerDetail(
+    BuildContext context,
+    AppThemeTokens tokens,
+    CustomerProfile c,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -364,8 +504,10 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
             CircleAvatar(
               radius: 28,
               backgroundColor: _segmentColor(c.segment).withValues(alpha: 0.2),
-              child: Text(c.name.isNotEmpty ? c.name[0] : '?',
-                  style: TextStyle(fontSize: 24, color: _segmentColor(c.segment))),
+              child: Text(
+                c.name.isNotEmpty ? c.name[0] : '?',
+                style: TextStyle(fontSize: 24, color: _segmentColor(c.segment)),
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -374,17 +516,29 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
                 children: [
                   Row(
                     children: [
-                      Text(c.name, style: Theme.of(context).textTheme.titleLarge),
+                      Text(
+                        c.name,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
                       const SizedBox(width: 8),
-                      AppStatusTag(label: c.segment, tone: _segmentTone(c.segment)),
+                      AppStatusTag(
+                        label: c.segment,
+                        tone: _segmentTone(c.segment),
+                      ),
                       if (c.isDecisionMaker) ...[
                         const SizedBox(width: 8),
-                        const AppStatusTag(label: '决策人', tone: AppStatusTone.success),
+                        const AppStatusTag(
+                          label: '决策人',
+                          tone: AppStatusTone.success,
+                        ),
                       ],
                     ],
                   ),
                   if (c.company != null)
-                    Text(c.company!, style: Theme.of(context).textTheme.bodyMedium),
+                    Text(
+                      c.company!,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                 ],
               ),
             ),
@@ -404,12 +558,37 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
           children: [
             _InfoCard(icon: Icons.email, label: '邮箱', value: c.email ?? '-'),
             _InfoCard(icon: Icons.phone, label: '电话', value: c.phone ?? '-'),
-            _InfoCard(icon: Icons.business, label: '行业', value: c.industry ?? '-'),
-            _InfoCard(icon: Icons.account_balance_wallet, label: '预算级别', value: _budgetLabel(c.budgetLevel)),
-            _InfoCard(icon: Icons.timeline, label: '生命周期', value: _lifeCycleLabel(c.lifeCycleStage)),
-            _InfoCard(icon: Icons.attach_money, label: '累计营收', value: '¥${c.totalRevenue.toStringAsFixed(0)}'),
-            _InfoCard(icon: Icons.shield, label: '风险评分', value: '${c.riskScore}/100'),
-            _InfoCard(icon: Icons.access_time, label: '最近联系', value: c.lastContactAt?.toLocal().toString().substring(0, 10) ?? '-'),
+            _InfoCard(
+              icon: Icons.business,
+              label: '行业',
+              value: c.industry ?? '-',
+            ),
+            _InfoCard(
+              icon: Icons.account_balance_wallet,
+              label: '预算级别',
+              value: _budgetLabel(c.budgetLevel),
+            ),
+            _InfoCard(
+              icon: Icons.timeline,
+              label: '生命周期',
+              value: _lifeCycleLabel(c.lifeCycleStage),
+            ),
+            _InfoCard(
+              icon: Icons.attach_money,
+              label: '累计营收',
+              value: '¥${c.totalRevenue.toStringAsFixed(0)}',
+            ),
+            _InfoCard(
+              icon: Icons.shield,
+              label: '风险评分',
+              value: '${c.riskScore}/100',
+            ),
+            _InfoCard(
+              icon: Icons.access_time,
+              label: '最近联系',
+              value:
+                  c.lastContactAt?.toLocal().toString().substring(0, 10) ?? '-',
+            ),
           ],
         ),
 
@@ -435,10 +614,14 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
           Wrap(
             spacing: 6,
             runSpacing: 4,
-            children: c.tags.map((t) => Chip(
-              label: Text(t, style: const TextStyle(fontSize: 11)),
-              visualDensity: VisualDensity.compact,
-            )).toList(),
+            children: c.tags
+                .map(
+                  (t) => Chip(
+                    label: Text(t, style: const TextStyle(fontSize: 11)),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                )
+                .toList(),
           ),
         ],
       ],
@@ -447,43 +630,65 @@ class _CustomerCenterPageState extends State<CustomerCenterPage> {
 
   Color _segmentColor(String segment) {
     switch (segment) {
-      case '高意向': return Colors.green;
-      case '中意向': return Colors.orange;
-      case '低意向': return Colors.grey;
-      case '已成交': return Colors.blue;
-      case '已流失': return Colors.red;
-      default: return Colors.grey;
+      case '高意向':
+        return Colors.green;
+      case '中意向':
+        return Colors.orange;
+      case '低意向':
+        return Colors.grey;
+      case '已成交':
+        return Colors.blue;
+      case '已流失':
+        return Colors.red;
+      default:
+        return Colors.grey;
     }
   }
 
   AppStatusTone _segmentTone(String segment) {
     switch (segment) {
-      case '高意向': return AppStatusTone.success;
-      case '中意向': return AppStatusTone.warning;
-      case '已成交': return AppStatusTone.success;
-      case '已流失': return AppStatusTone.danger;
-      default: return AppStatusTone.neutral;
+      case '高意向':
+        return AppStatusTone.success;
+      case '中意向':
+        return AppStatusTone.warning;
+      case '已成交':
+        return AppStatusTone.success;
+      case '已流失':
+        return AppStatusTone.danger;
+      default:
+        return AppStatusTone.neutral;
     }
   }
 
   String _budgetLabel(String? level) {
     switch (level) {
-      case 'low': return '低';
-      case 'medium': return '中';
-      case 'high': return '高';
-      case 'enterprise': return '企业级';
-      default: return '-';
+      case 'low':
+        return '低';
+      case 'medium':
+        return '中';
+      case 'high':
+        return '高';
+      case 'enterprise':
+        return '企业级';
+      default:
+        return '-';
     }
   }
 
   String _lifeCycleLabel(String stage) {
     switch (stage) {
-      case 'lead': return '线索';
-      case 'prospect': return '意向';
-      case 'opportunity': return '商机';
-      case 'customer': return '客户';
-      case 'churned': return '流失';
-      default: return stage;
+      case 'lead':
+        return '线索';
+      case 'prospect':
+        return '意向';
+      case 'opportunity':
+        return '商机';
+      case 'customer':
+        return '客户';
+      case 'churned':
+        return '流失';
+      default:
+        return stage;
     }
   }
 }
@@ -499,12 +704,21 @@ class _MiniMetric extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: (color ?? Theme.of(context).colorScheme.primary).withValues(alpha: 0.08),
+        color: (color ?? Theme.of(context).colorScheme.primary).withValues(
+          alpha: 0.08,
+        ),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Column(
         children: [
-          Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color)),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
           Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey)),
         ],
       ),
@@ -513,7 +727,11 @@ class _MiniMetric extends StatelessWidget {
 }
 
 class _InfoCard extends StatelessWidget {
-  const _InfoCard({required this.icon, required this.label, required this.value});
+  const _InfoCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
   final IconData icon;
   final String label;
   final String value;
@@ -527,14 +745,25 @@ class _InfoCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
+              Icon(
+                icon,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey)),
-                    Text(value, style: const TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis),
+                    Text(
+                      label,
+                      style: const TextStyle(fontSize: 10, color: Colors.grey),
+                    ),
+                    Text(
+                      value,
+                      style: const TextStyle(fontSize: 13),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),

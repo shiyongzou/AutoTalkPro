@@ -30,13 +30,15 @@ class OrderService {
       final price = prices[product.id] ?? product.basePrice;
       if (price < 0) throw ArgumentError('价格不能为负: ${product.name}');
       final lineTotal = price * qty;
-      items.add(OrderItem(
-        productId: product.id,
-        productName: product.name,
-        quantity: qty,
-        unitPrice: price,
-        totalPrice: lineTotal,
-      ));
+      items.add(
+        OrderItem(
+          productId: product.id,
+          productName: product.name,
+          quantity: qty,
+          unitPrice: price,
+          totalPrice: lineTotal,
+        ),
+      );
       total += lineTotal;
     }
 

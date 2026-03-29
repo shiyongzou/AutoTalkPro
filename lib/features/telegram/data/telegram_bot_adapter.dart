@@ -18,10 +18,8 @@ class TelegramBotConfig {
 
   String get baseUrl => '$apiBase/bot$botToken';
 
-  static TelegramBotConfig defaults() => const TelegramBotConfig(
-    botToken: '',
-    enabled: false,
-  );
+  static TelegramBotConfig defaults() =>
+      const TelegramBotConfig(botToken: '', enabled: false);
 }
 
 /// Telegram Bot API 消息
@@ -45,10 +43,8 @@ class TgBotMessage {
 
 /// Telegram Bot API 适配器 — 真正收发消息
 class TelegramBotAdapter implements ChannelAdapter {
-  TelegramBotAdapter({
-    required this.config,
-    http.Client? httpClient,
-  }) : _client = httpClient ?? http.Client();
+  TelegramBotAdapter({required this.config, http.Client? httpClient})
+    : _client = httpClient ?? http.Client();
 
   final TelegramBotConfig config;
   final http.Client _client;
@@ -68,15 +64,17 @@ class TelegramBotAdapter implements ChannelAdapter {
     final chats = <ChannelChatSummary>[];
     for (final msg in messages) {
       if (seen.add(msg.chatId)) {
-        chats.add(ChannelChatSummary(
-          channel: ChannelType.telegram,
-          peerId: msg.chatId.toString(),
-          title: msg.fromName,
-          lastMessagePreview: msg.text.length > 50
-              ? '${msg.text.substring(0, 50)}...'
-              : msg.text,
-          lastMessageAt: msg.date,
-        ));
+        chats.add(
+          ChannelChatSummary(
+            channel: ChannelType.telegram,
+            peerId: msg.chatId.toString(),
+            title: msg.fromName,
+            lastMessagePreview: msg.text.length > 50
+                ? '${msg.text.substring(0, 50)}...'
+                : msg.text,
+            lastMessageAt: msg.date,
+          ),
+        );
       }
     }
     return chats;
@@ -90,14 +88,13 @@ class TelegramBotAdapter implements ChannelAdapter {
     if (!config.enabled || config.botToken.isEmpty) return false;
 
     try {
-      final response = await _client.post(
-        Uri.parse('${config.baseUrl}/sendMessage'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'chat_id': peerId,
-          'text': text,
-        }),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _client
+          .post(
+            Uri.parse('${config.baseUrl}/sendMessage'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'chat_id': peerId, 'text': text}),
+          )
+          .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
@@ -120,9 +117,13 @@ class TelegramBotAdapter implements ChannelAdapter {
         'allowed_updates': '["message"]',
       };
 
-      final response = await _client.get(
-        Uri.parse('${config.baseUrl}/getUpdates').replace(queryParameters: params),
-      ).timeout(Duration(seconds: timeout + 10));
+      final response = await _client
+          .get(
+            Uri.parse(
+              '${config.baseUrl}/getUpdates',
+            ).replace(queryParameters: params),
+          )
+          .timeout(Duration(seconds: timeout + 10));
 
       if (response.statusCode != 200) return const [];
 
@@ -144,16 +145,18 @@ class TelegramBotAdapter implements ChannelAdapter {
         final text = message['text'];
         if (chat == null || text == null) continue;
 
-        results.add(TgBotMessage(
-          updateId: updateId,
-          chatId: chat['id'] as int,
-          fromId: from?['id'] as int? ?? 0,
-          fromName: from?['first_name'] as String? ?? 'Unknown',
-          text: text as String,
-          date: DateTime.fromMillisecondsSinceEpoch(
-            (message['date'] as int) * 1000,
+        results.add(
+          TgBotMessage(
+            updateId: updateId,
+            chatId: chat['id'] as int,
+            fromId: from?['id'] as int? ?? 0,
+            fromName: from?['first_name'] as String? ?? 'Unknown',
+            text: text as String,
+            date: DateTime.fromMillisecondsSinceEpoch(
+              (message['date'] as int) * 1000,
+            ),
           ),
-        ));
+        );
       }
 
       return results;
@@ -175,9 +178,9 @@ class TelegramBotAdapter implements ChannelAdapter {
     }
 
     try {
-      final response = await _client.get(
-        Uri.parse('${config.baseUrl}/getMe'),
-      ).timeout(const Duration(seconds: 5));
+      final response = await _client
+          .get(Uri.parse('${config.baseUrl}/getMe'))
+          .timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);

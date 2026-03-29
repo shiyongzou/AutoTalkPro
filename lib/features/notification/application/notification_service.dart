@@ -66,16 +66,18 @@ class NotificationService {
 
   /// 从升级告警生成通知
   void notifyFromEscalation(EscalationAlert alert) {
-    notify(AppNotification(
-      id: 'notif_${alert.id}',
-      type: NotificationType.escalation,
-      title: _priorityEmoji(alert.priority) + alert.title,
-      body: alert.suggestedAction,
-      priority: alert.priority,
-      conversationId: alert.conversationId,
-      actionLabel: '查看会话',
-      createdAt: DateTime.now(),
-    ));
+    notify(
+      AppNotification(
+        id: 'notif_${alert.id}',
+        type: NotificationType.escalation,
+        title: _priorityEmoji(alert.priority) + alert.title,
+        body: alert.suggestedAction,
+        priority: alert.priority,
+        conversationId: alert.conversationId,
+        actionLabel: '查看会话',
+        createdAt: DateTime.now(),
+      ),
+    );
   }
 
   /// autopilot hold 通知
@@ -83,16 +85,18 @@ class NotificationService {
     required String conversationId,
     required String reason,
   }) {
-    notify(AppNotification(
-      id: 'notif_hold_${DateTime.now().microsecondsSinceEpoch}',
-      type: NotificationType.autopilotHold,
-      title: '需要人工审核',
-      body: reason,
-      priority: EscalationPriority.medium,
-      conversationId: conversationId,
-      actionLabel: '审核回复',
-      createdAt: DateTime.now(),
-    ));
+    notify(
+      AppNotification(
+        id: 'notif_hold_${DateTime.now().microsecondsSinceEpoch}',
+        type: NotificationType.autopilotHold,
+        title: '需要人工审核',
+        body: reason,
+        priority: EscalationPriority.medium,
+        conversationId: conversationId,
+        actionLabel: '审核回复',
+        createdAt: DateTime.now(),
+      ),
+    );
   }
 
   String _priorityEmoji(EscalationPriority priority) {

@@ -4,7 +4,8 @@ import '../domain/telegram_config.dart';
 import '../domain/telegram_config_repository.dart';
 
 class LocalTelegramConfigRepository implements TelegramConfigRepository {
-  LocalTelegramConfigRepository({required SharedPreferences prefs}) : _prefs = prefs;
+  LocalTelegramConfigRepository({required SharedPreferences prefs})
+    : _prefs = prefs;
 
   final SharedPreferences _prefs;
 

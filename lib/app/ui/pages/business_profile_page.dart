@@ -86,8 +86,10 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
     setState(() {
       profiles.removeAt(index);
       if (activeIndex == index) activeIndex = null;
-      if (activeIndex != null && activeIndex! > index) activeIndex = activeIndex! - 1;
-      if (selectedIndex >= profiles.length) selectedIndex = profiles.isEmpty ? 0 : profiles.length - 1;
+      if (activeIndex != null && activeIndex! > index)
+        activeIndex = activeIndex! - 1;
+      if (selectedIndex >= profiles.length)
+        selectedIndex = profiles.isEmpty ? 0 : profiles.length - 1;
     });
     _save();
   }
@@ -131,7 +133,10 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                       child: FilledButton.icon(
                         onPressed: () => _addProfile('profession'),
                         icon: const Icon(Icons.add, size: 16),
-                        label: const Text('新增人设', style: TextStyle(fontSize: 12)),
+                        label: const Text(
+                          '新增人设',
+                          style: TextStyle(fontSize: 12),
+                        ),
                       ),
                     ),
                   ],
@@ -144,7 +149,11 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                       padding: EdgeInsets.all(tokens.spaceLg),
                       child: Text(
                         '还没有人设\n\n点上方按钮创建\n\n例如：产科医生、心理咨询师、律师、健身教练\n\nAI会按你设定的职业身份和专业知识回答问题',
-                        style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant, height: 1.6),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: scheme.onSurfaceVariant,
+                          height: 1.6,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -161,25 +170,41 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                       return ListTile(
                         dense: true,
                         selected: isSelected,
-                        selectedTileColor: scheme.primaryContainer.withValues(alpha: 0.3),
+                        selectedTileColor: scheme.primaryContainer.withValues(
+                          alpha: 0.3,
+                        ),
                         leading: Icon(
                           Icons.person,
                           size: 18,
-                          color: isActive ? Colors.green : scheme.onSurfaceVariant,
+                          color: isActive
+                              ? Colors.green
+                              : scheme.onSurfaceVariant,
                         ),
                         title: Row(
                           children: [
                             Expanded(
-                              child: Text(p['name'] ?? '', style: const TextStyle(fontSize: 13)),
+                              child: Text(
+                                p['name'] ?? '',
+                                style: const TextStyle(fontSize: 13),
+                              ),
                             ),
                             if (isActive)
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 1,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.green.shade100,
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: Text('使用中', style: TextStyle(fontSize: 10, color: Colors.green.shade800)),
+                                child: Text(
+                                  '使用中',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.green.shade800,
+                                  ),
+                                ),
                               ),
                           ],
                         ),
@@ -210,7 +235,11 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
     );
   }
 
-  Widget _buildEditor(BuildContext context, AppThemeTokens tokens, ColorScheme scheme) {
+  Widget _buildEditor(
+    BuildContext context,
+    AppThemeTokens tokens,
+    ColorScheme scheme,
+  ) {
     final p = profiles[selectedIndex];
     final isActive = activeIndex == selectedIndex;
     final rules = (p['rules'] as List?)?.cast<String>() ?? [];
@@ -221,7 +250,10 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
         Row(
           children: [
             Expanded(
-              child: Text('编辑人设', style: Theme.of(context).textTheme.titleLarge),
+              child: Text(
+                '编辑人设',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
             ),
             if (!isActive)
               FilledButton.icon(
@@ -231,7 +263,11 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
               ),
             if (isActive)
               Chip(
-                avatar: const Icon(Icons.check_circle, color: Colors.green, size: 16),
+                avatar: const Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: 16,
+                ),
                 label: const Text('当前使用中'),
                 backgroundColor: Colors.green.shade50,
               ),
@@ -250,17 +286,47 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
         ),
         SizedBox(height: tokens.spaceLg),
 
-        _field('人设名称', '给这个人设起个名字，方便区分', p['name'] ?? '', (v) { p['name'] = v; _save(); }),
-        _field('AI名字', '对话中AI怎么自称', p['aiName'] ?? '', (v) { p['aiName'] = v; _save(); }),
-        _field('职业', '如：产科医生、心理咨询师、律师、健身教练', p['profession'] ?? '', (v) { p['profession'] = v; _save(); }),
-        _bigField('擅长领域 / 回答规则', '可以输入详细的专业领域描述、回答框架、注意事项等', p['expertise'] ?? '', (v) { p['expertise'] = v; _save(); }),
-        _bigField('说话风格', '如：温柔耐心，用通俗的话解释专业问题，不吓人', p['style'] ?? '', (v) { p['style'] = v; _save(); }),
-        _field('开场白', '第一次跟人聊天时说的话', p['greeting'] ?? '', (v) { p['greeting'] = v; _save(); }),
+        _field('人设名称', '给这个人设起个名字，方便区分', p['name'] ?? '', (v) {
+          p['name'] = v;
+          _save();
+        }),
+        _field('AI名字', '对话中AI怎么自称', p['aiName'] ?? '', (v) {
+          p['aiName'] = v;
+          _save();
+        }),
+        _field('职业', '如：产科医生、心理咨询师、律师、健身教练', p['profession'] ?? '', (v) {
+          p['profession'] = v;
+          _save();
+        }),
+        _bigField(
+          '擅长领域 / 回答规则',
+          '可以输入详细的专业领域描述、回答框架、注意事项等',
+          p['expertise'] ?? '',
+          (v) {
+            p['expertise'] = v;
+            _save();
+          },
+        ),
+        _bigField('说话风格', '如：温柔耐心，用通俗的话解释专业问题，不吓人', p['style'] ?? '', (v) {
+          p['style'] = v;
+          _save();
+        }),
+        _field('开场白', '第一次跟人聊天时说的话', p['greeting'] ?? '', (v) {
+          p['greeting'] = v;
+          _save();
+        }),
 
         SizedBox(height: tokens.spaceMd),
         Row(
           children: [
-            Text('行为规则', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: scheme.primary)),
+            Text(
+              '行为规则',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: scheme.primary,
+              ),
+            ),
             const SizedBox(width: 8),
             Text(
               '如：不确定的说"建议就医确认"',
@@ -292,7 +358,10 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                       hintText: '输入一条规则',
                       border: const OutlineInputBorder(),
                       isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                       prefixText: '${i + 1}. ',
                     ),
                     style: const TextStyle(fontSize: 14),
@@ -305,7 +374,11 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                 ),
                 const SizedBox(width: 4),
                 IconButton(
-                  icon: Icon(Icons.remove_circle_outline, size: 18, color: Colors.red.shade300),
+                  icon: Icon(
+                    Icons.remove_circle_outline,
+                    size: 18,
+                    color: Colors.red.shade300,
+                  ),
                   onPressed: () {
                     rules.removeAt(i);
                     p['rules'] = rules;
@@ -321,7 +394,12 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
     );
   }
 
-  Widget _bigField(String label, String hint, String value, ValueChanged<String> onChanged) {
+  Widget _bigField(
+    String label,
+    String hint,
+    String value,
+    ValueChanged<String> onChanged,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
@@ -340,7 +418,12 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
     );
   }
 
-  Widget _field(String label, String hint, String value, ValueChanged<String> onChanged) {
+  Widget _field(
+    String label,
+    String hint,
+    String value,
+    ValueChanged<String> onChanged,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(

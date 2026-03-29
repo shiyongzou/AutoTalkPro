@@ -227,7 +227,10 @@ class AppTheme {
         fillColor: tokens.surfaceMuted,
         // 确保夜间模式下文字和hint可见
         labelStyle: TextStyle(color: scheme.onSurfaceVariant, fontSize: 14),
-        hintStyle: TextStyle(color: scheme.onSurfaceVariant.withValues(alpha: 0.6), fontSize: 14),
+        hintStyle: TextStyle(
+          color: scheme.onSurfaceVariant.withValues(alpha: 0.6),
+          fontSize: 14,
+        ),
         prefixIconColor: scheme.onSurfaceVariant,
         suffixIconColor: scheme.onSurfaceVariant,
         border: OutlineInputBorder(

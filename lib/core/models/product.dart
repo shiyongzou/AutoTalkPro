@@ -31,9 +31,9 @@ class Product {
 
   // V3: 交易扩展字段
   final String transactionType; // 'subscription', 'oneTime', 'negotiable'
-  final int? stock;             // null = 不限库存
-  final String deliveryMethod;  // 'digital', 'physical', 'service', 'instant'
-  final List<String> tags;      // 额外标签用于搜索匹配
+  final int? stock; // null = 不限库存
+  final String deliveryMethod; // 'digital', 'physical', 'service', 'instant'
+  final List<String> tags; // 额外标签用于搜索匹配
 
   double get discountFloorPercent =>
       basePrice > 0 ? (floorPrice / basePrice * 100) : 100;

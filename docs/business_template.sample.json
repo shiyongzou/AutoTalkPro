@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "name": "B2B销售标准模板",
+    "industry": "b2b_sales",
+    "version": "1.0.0",
+    "author": "official",
+    "description": "用于B2B线索跟进与预约演示",
+    "compatibleSchema": "1.0"
+  },
+  "persona": {
+    "role": "资深B2B顾问",
+    "tone": "专业、礼貌",
+    "style": "简洁推进",
+    "forbiddenPromises": ["保证收益", "承诺绝对结果"]
+  },
+  "script": {
+    "goals": ["收集需求", "预约演示"],
+    "stages": [
+      {
+        "key": "init",
+        "description": "建立联系并确认业务背景",
+        "enterWhen": ["收到客户首条回复"],
+        "exitWhen": ["客户表达明确兴趣"]
+      },
+      {
+        "key": "need_discovery",
+        "description": "确认预算、时间和关键需求",
+        "enterWhen": ["进入兴趣阶段"],
+        "exitWhen": ["需求收集完整"]
+      },
+      {
+        "key": "appointment",
+        "description": "推进演示预约",
+        "enterWhen": ["需求收集完整"],
+        "exitWhen": ["预约时间确认"]
+      }
+    ]
+  },
+  "policy": {
+    "mode": "L1",
+    "handoffRules": ["客户索要合同", "客户投诉", "客户明确下单"],
+    "riskKeywords": ["投诉", "退款", "报警"]
+  },
+  "kpi": {
+    "metrics": ["推进率", "预约率", "转化率"],
+    "reportCadence": ["daily", "weekly", "monthly"]
+  }
+}

@@ -78,9 +78,13 @@ class QuickQuoteService {
     if (matchedProduct == null && products.isNotEmpty) {
       // 交易模式下，返回产品列表
       if (profile.businessType == BusinessType.trading) {
-        final list = products.take(5).map((p) =>
-          '${p.name} ${profile.currency}${p.basePrice.toStringAsFixed(0)}',
-        ).join('\n');
+        final list = products
+            .take(5)
+            .map(
+              (p) =>
+                  '${p.name} ${profile.currency}${p.basePrice.toStringAsFixed(0)}',
+            )
+            .join('\n');
         return QuickQuoteResult(
           matched: true,
           replyText: '目前有这些：\n$list\n要哪个？',

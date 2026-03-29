@@ -21,9 +21,18 @@ class DriftOrderRepository implements OrderRepository {
         created_at,updated_at
       ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
       [
-        order.id, order.conversationId, order.customerId, order.customerName,
-        itemsJson, order.totalAmount, order.currency, order.status.name,
-        order.paymentMethod, order.deliveryMethod, order.deliveryInfo, order.notes,
+        order.id,
+        order.conversationId,
+        order.customerId,
+        order.customerName,
+        itemsJson,
+        order.totalAmount,
+        order.currency,
+        order.status.name,
+        order.paymentMethod,
+        order.deliveryMethod,
+        order.deliveryInfo,
+        order.notes,
         order.paidAt?.millisecondsSinceEpoch,
         order.deliveredAt?.millisecondsSinceEpoch,
         order.completedAt?.millisecondsSinceEpoch,
@@ -35,61 +44,73 @@ class DriftOrderRepository implements OrderRepository {
 
   @override
   Future<Order?> getById(String id) async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM orders WHERE id = ?',
-      variables: [Variable(id)],
-      readsFrom: {},
-    ).get();
+    final rows = await _db
+        .customSelect(
+          'SELECT * FROM orders WHERE id = ?',
+          variables: [Variable(id)],
+          readsFrom: {},
+        )
+        .get();
     if (rows.isEmpty) return null;
     return _fromRow(rows.first);
   }
 
   @override
   Future<List<Order>> listByConversation(String conversationId) async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM orders WHERE conversation_id = ? ORDER BY created_at DESC',
-      variables: [Variable(conversationId)],
-      readsFrom: {},
-    ).get();
+    final rows = await _db
+        .customSelect(
+          'SELECT * FROM orders WHERE conversation_id = ? ORDER BY created_at DESC',
+          variables: [Variable(conversationId)],
+          readsFrom: {},
+        )
+        .get();
     return rows.map(_fromRow).toList();
   }
 
   @override
   Future<List<Order>> listByCustomer(String customerId) async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM orders WHERE customer_id = ? ORDER BY created_at DESC',
-      variables: [Variable(customerId)],
-      readsFrom: {},
-    ).get();
+    final rows = await _db
+        .customSelect(
+          'SELECT * FROM orders WHERE customer_id = ? ORDER BY created_at DESC',
+          variables: [Variable(customerId)],
+          readsFrom: {},
+        )
+        .get();
     return rows.map(_fromRow).toList();
   }
 
   @override
   Future<List<Order>> listByStatus(OrderStatus status) async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM orders WHERE status = ? ORDER BY created_at DESC',
-      variables: [Variable(status.name)],
-      readsFrom: {},
-    ).get();
+    final rows = await _db
+        .customSelect(
+          'SELECT * FROM orders WHERE status = ? ORDER BY created_at DESC',
+          variables: [Variable(status.name)],
+          readsFrom: {},
+        )
+        .get();
     return rows.map(_fromRow).toList();
   }
 
   @override
   Future<List<Order>> listAll({int limit = 100}) async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM orders ORDER BY created_at DESC LIMIT ?',
-      variables: [Variable(limit)],
-      readsFrom: {},
-    ).get();
+    final rows = await _db
+        .customSelect(
+          'SELECT * FROM orders ORDER BY created_at DESC LIMIT ?',
+          variables: [Variable(limit)],
+          readsFrom: {},
+        )
+        .get();
     return rows.map(_fromRow).toList();
   }
 
   @override
   Future<int> activeCount() async {
-    final row = await _db.customSelect(
-      "SELECT COUNT(1) c FROM orders WHERE status NOT IN ('completed','cancelled','refunded')",
-      readsFrom: {},
-    ).getSingle();
+    final row = await _db
+        .customSelect(
+          "SELECT COUNT(1) c FROM orders WHERE status NOT IN ('completed','cancelled','refunded')",
+          readsFrom: {},
+        )
+        .getSingle();
     return row.read<int>('c');
   }
 
@@ -122,8 +143,12 @@ class DriftOrderRepository implements OrderRepository {
       paidAt: readTimestamp('paid_at'),
       deliveredAt: readTimestamp('delivered_at'),
       completedAt: readTimestamp('completed_at'),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(row.read<int>('created_at')),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.read<int>('updated_at')),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(
+        row.read<int>('created_at'),
+      ),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(
+        row.read<int>('updated_at'),
+      ),
     );
   }
 }

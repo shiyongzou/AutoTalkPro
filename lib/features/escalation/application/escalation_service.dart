@@ -33,56 +33,66 @@ class EscalationService {
 
     // 1. 风险关键词检测
     final riskWords = ['投诉', '退款', '举报', '维权', '曝光', '律师', '法院'];
-    final hitRisk = riskWords.where((w) => message.content.contains(w)).toList();
+    final hitRisk = riskWords
+        .where((w) => message.content.contains(w))
+        .toList();
     if (hitRisk.isNotEmpty) {
-      alerts.add(EscalationAlert(
-        id: 'esc_risk_${now.microsecondsSinceEpoch}',
-        conversationId: conversationId,
-        customerId: customerId,
-        reason: EscalationReason.riskDetected,
-        priority: EscalationPriority.critical,
-        status: EscalationStatus.pending,
-        title: '风险告警: 客户提及${hitRisk.join("、")}',
-        detail: '客户消息: ${message.content}',
-        suggestedAction: '立即人工介入，安抚客户情绪，避免升级',
-        createdAt: now,
-        updatedAt: now,
-      ));
+      alerts.add(
+        EscalationAlert(
+          id: 'esc_risk_${now.microsecondsSinceEpoch}',
+          conversationId: conversationId,
+          customerId: customerId,
+          reason: EscalationReason.riskDetected,
+          priority: EscalationPriority.critical,
+          status: EscalationStatus.pending,
+          title: '风险告警: 客户提及${hitRisk.join("、")}',
+          detail: '客户消息: ${message.content}',
+          suggestedAction: '立即人工介入，安抚客户情绪，避免升级',
+          createdAt: now,
+          updatedAt: now,
+        ),
+      );
     }
 
     // 2. 客户情绪异常
-    if (sentiment != null && sentiment.sentiment == SentimentType.negative &&
+    if (sentiment != null &&
+        sentiment.sentiment == SentimentType.negative &&
         sentiment.confidence > 0.8) {
-      alerts.add(EscalationAlert(
-        id: 'esc_angry_${now.microsecondsSinceEpoch}',
-        conversationId: conversationId,
-        customerId: customerId,
-        reason: EscalationReason.customerAngry,
-        priority: EscalationPriority.high,
-        status: EscalationStatus.pending,
-        title: '情绪告警: 客户强烈不满(置信度${(sentiment.confidence * 100).toInt()}%)',
-        detail: '情绪标签: ${sentiment.emotionTags.join("、")}\n异议: ${sentiment.objectionPatterns.join("、")}',
-        suggestedAction: '切换为人工对话，优先处理情绪，再解决问题',
-        createdAt: now,
-        updatedAt: now,
-      ));
+      alerts.add(
+        EscalationAlert(
+          id: 'esc_angry_${now.microsecondsSinceEpoch}',
+          conversationId: conversationId,
+          customerId: customerId,
+          reason: EscalationReason.customerAngry,
+          priority: EscalationPriority.high,
+          status: EscalationStatus.pending,
+          title: '情绪告警: 客户强烈不满(置信度${(sentiment.confidence * 100).toInt()}%)',
+          detail:
+              '情绪标签: ${sentiment.emotionTags.join("、")}\n异议: ${sentiment.objectionPatterns.join("、")}',
+          suggestedAction: '切换为人工对话，优先处理情绪，再解决问题',
+          createdAt: now,
+          updatedAt: now,
+        ),
+      );
     }
 
     // 3. 紧急情绪
     if (sentiment != null && sentiment.isUrgent) {
-      alerts.add(EscalationAlert(
-        id: 'esc_urgent_${now.microsecondsSinceEpoch}',
-        conversationId: conversationId,
-        customerId: customerId,
-        reason: EscalationReason.customerWaitingTooLong,
-        priority: EscalationPriority.high,
-        status: EscalationStatus.pending,
-        title: '紧急告警: 客户表达急迫需求',
-        detail: '客户消息: ${message.content}',
-        suggestedAction: '立即响应，缩短回复间隔，优先处理',
-        createdAt: now,
-        updatedAt: now,
-      ));
+      alerts.add(
+        EscalationAlert(
+          id: 'esc_urgent_${now.microsecondsSinceEpoch}',
+          conversationId: conversationId,
+          customerId: customerId,
+          reason: EscalationReason.customerWaitingTooLong,
+          priority: EscalationPriority.high,
+          status: EscalationStatus.pending,
+          title: '紧急告警: 客户表达急迫需求',
+          detail: '客户消息: ${message.content}',
+          suggestedAction: '立即响应，缩短回复间隔，优先处理',
+          createdAt: now,
+          updatedAt: now,
+        ),
+      );
     }
 
     // 4. 谈判引擎触发的升级
@@ -101,38 +111,42 @@ class EscalationService {
         priority = EscalationPriority.medium;
       }
 
-      alerts.add(EscalationAlert(
-        id: 'esc_neg_${now.microsecondsSinceEpoch}',
-        conversationId: conversationId,
-        customerId: customerId,
-        reason: reason,
-        priority: priority,
-        status: EscalationStatus.pending,
-        title: '谈判升级: $negotiationEscalateReason',
-        detail: negotiation != null
-            ? '当前阶段: ${negotiation.stage.name}, 让步: ${negotiation.concessionCount}/${negotiation.maxConcessions}, 成交分: ${(negotiation.dealScore * 100).toInt()}%'
-            : negotiationEscalateReason,
-        suggestedAction: '人工审核当前报价策略，决定是否继续让步或坚守',
-        createdAt: now,
-        updatedAt: now,
-      ));
+      alerts.add(
+        EscalationAlert(
+          id: 'esc_neg_${now.microsecondsSinceEpoch}',
+          conversationId: conversationId,
+          customerId: customerId,
+          reason: reason,
+          priority: priority,
+          status: EscalationStatus.pending,
+          title: '谈判升级: $negotiationEscalateReason',
+          detail: negotiation != null
+              ? '当前阶段: ${negotiation.stage.name}, 让步: ${negotiation.concessionCount}/${negotiation.maxConcessions}, 成交分: ${(negotiation.dealScore * 100).toInt()}%'
+              : negotiationEscalateReason,
+          suggestedAction: '人工审核当前报价策略，决定是否继续让步或坚守',
+          createdAt: now,
+          updatedAt: now,
+        ),
+      );
     }
 
     // 5. AI置信度过低
     if (aiConfidence < 0.5) {
-      alerts.add(EscalationAlert(
-        id: 'esc_confidence_${now.microsecondsSinceEpoch}',
-        conversationId: conversationId,
-        customerId: customerId,
-        reason: EscalationReason.aiConfidenceLow,
-        priority: EscalationPriority.medium,
-        status: EscalationStatus.pending,
-        title: 'AI置信度低: ${(aiConfidence * 100).toInt()}%',
-        detail: 'AI对当前回复的把握不足，建议人工审核后发送',
-        suggestedAction: '人工审核AI生成的回复内容，修改后再发送',
-        createdAt: now,
-        updatedAt: now,
-      ));
+      alerts.add(
+        EscalationAlert(
+          id: 'esc_confidence_${now.microsecondsSinceEpoch}',
+          conversationId: conversationId,
+          customerId: customerId,
+          reason: EscalationReason.aiConfidenceLow,
+          priority: EscalationPriority.medium,
+          status: EscalationStatus.pending,
+          title: 'AI置信度低: ${(aiConfidence * 100).toInt()}%',
+          detail: 'AI对当前回复的把握不足，建议人工审核后发送',
+          suggestedAction: '人工审核AI生成的回复内容，修改后再发送',
+          createdAt: now,
+          updatedAt: now,
+        ),
+      );
     }
 
     // 6. 高价值成交阶段
@@ -140,19 +154,21 @@ class EscalationService {
         negotiation.stage == NegotiationStage.closing &&
         negotiation.ourOfferPrice != null &&
         negotiation.ourOfferPrice! > 5000) {
-      alerts.add(EscalationAlert(
-        id: 'esc_highval_${now.microsecondsSinceEpoch}',
-        conversationId: conversationId,
-        customerId: customerId,
-        reason: EscalationReason.highValueDeal,
-        priority: EscalationPriority.medium,
-        status: EscalationStatus.pending,
-        title: '高价值成交提醒: ¥${negotiation.ourOfferPrice!.toStringAsFixed(0)}',
-        detail: '该单即将成交，金额较大，建议人工确认条款细节',
-        suggestedAction: '人工介入确认合同条款、付款方式等关键细节',
-        createdAt: now,
-        updatedAt: now,
-      ));
+      alerts.add(
+        EscalationAlert(
+          id: 'esc_highval_${now.microsecondsSinceEpoch}',
+          conversationId: conversationId,
+          customerId: customerId,
+          reason: EscalationReason.highValueDeal,
+          priority: EscalationPriority.medium,
+          status: EscalationStatus.pending,
+          title: '高价值成交提醒: ¥${negotiation.ourOfferPrice!.toStringAsFixed(0)}',
+          detail: '该单即将成交，金额较大，建议人工确认条款细节',
+          suggestedAction: '人工介入确认合同条款、付款方式等关键细节',
+          createdAt: now,
+          updatedAt: now,
+        ),
+      );
     }
 
     // 持久化
@@ -175,12 +191,14 @@ class EscalationService {
     final target = pending.where((a) => a.id == alertId).firstOrNull;
     if (target == null) return;
 
-    await repository.update(target.copyWith(
-      status: EscalationStatus.resolved,
-      resolvedBy: resolvedBy,
-      resolvedAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ));
+    await repository.update(
+      target.copyWith(
+        status: EscalationStatus.resolved,
+        resolvedBy: resolvedBy,
+        resolvedAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
   }
 
   /// 忽略告警
@@ -189,9 +207,11 @@ class EscalationService {
     final target = pending.where((a) => a.id == alertId).firstOrNull;
     if (target == null) return;
 
-    await repository.update(target.copyWith(
-      status: EscalationStatus.dismissed,
-      updatedAt: DateTime.now(),
-    ));
+    await repository.update(
+      target.copyWith(
+        status: EscalationStatus.dismissed,
+        updatedAt: DateTime.now(),
+      ),
+    );
   }
 }

@@ -91,7 +91,9 @@ class AutopilotService {
     final messagesWithIncoming = alreadyInDb
         ? allMessages
         : [...allMessages, incomingMessage];
-    final intentClassification = intentClassifier.classify(messagesWithIncoming);
+    final intentClassification = intentClassifier.classify(
+      messagesWithIncoming,
+    );
 
     // ── Step 3: 节奏策略 ──
     final cadenceDecision = cadencePolicy.evaluate(

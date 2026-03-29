@@ -36,8 +36,8 @@ void main() {
       final source = jsonEncode({
         'from': {
           'id': 'wx_u_1',
-          'payload': {'name': 'Alice'}
-        }
+          'payload': {'name': 'Alice'},
+        },
       });
 
       final future = listener.messages
@@ -64,46 +64,46 @@ void main() {
       expect(msg.content, '你好');
     });
 
-    test('group @ message with true should be emitted and marked mentioned', () async {
-      final source = jsonEncode({
-        'from': {
-          'id': 'wx_u_2',
-          'payload': {'name': 'Bob'}
-        },
-        'room': {
-          'id': '123@chatroom',
-          'topic': '测试群'
-        }
-      });
+    test(
+      'group @ message with true should be emitted and marked mentioned',
+      () async {
+        final source = jsonEncode({
+          'from': {
+            'id': 'wx_u_2',
+            'payload': {'name': 'Bob'},
+          },
+          'room': {'id': '123@chatroom', 'topic': '测试群'},
+        });
 
-      final future = listener.messages
-          .firstWhere((m) => m.content == '@机器人 在吗')
-          .timeout(const Duration(seconds: 3));
+        final future = listener.messages
+            .firstWhere((m) => m.content == '@机器人 在吗')
+            .timeout(const Duration(seconds: 3));
 
-      await _postJson(
-        url: Uri.parse(listener.callbackUrl),
-        body: {
-          'type': 'text',
-          'content': '@机器人 在吗',
-          'source': source,
-          'isMentioned': 'true',
-          'isMsgFromSelf': '0',
-        },
-      );
+        await _postJson(
+          url: Uri.parse(listener.callbackUrl),
+          body: {
+            'type': 'text',
+            'content': '@机器人 在吗',
+            'source': source,
+            'isMentioned': 'true',
+            'isMsgFromSelf': '0',
+          },
+        );
 
-      final msg = await future;
-      expect(msg.isPrivate, false);
-      expect(msg.isMentioned, true);
-      expect(msg.roomId, '123@chatroom');
-      expect(msg.roomName, '测试群');
-    });
+        final msg = await future;
+        expect(msg.isPrivate, false);
+        expect(msg.isMentioned, true);
+        expect(msg.roomId, '123@chatroom');
+        expect(msg.roomName, '测试群');
+      },
+    );
 
     test('self message should be ignored', () async {
       final source = jsonEncode({
         'from': {
           'id': 'self',
-          'payload': {'name': 'Self'}
-        }
+          'payload': {'name': 'Self'},
+        },
       });
 
       var emitted = false;

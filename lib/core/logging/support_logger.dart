@@ -12,14 +12,16 @@ class SupportLogger {
   SupportLogger._();
 
   static String _homeDir() {
-    final home = Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
+    final home =
+        Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
     if (home == null || home.isEmpty) {
       return Directory.current.path;
     }
     return home;
   }
 
-  static String _logsDir() => p.join(_homeDir(), '.tg_ai_sales_desktop', 'logs');
+  static String _logsDir() =>
+      p.join(_homeDir(), '.tg_ai_sales_desktop', 'logs');
 
   static String _runtimeLogPath() => p.join(_logsDir(), 'runtime.log');
 
@@ -56,7 +58,9 @@ class SupportLogger {
       if (!await src.exists()) return null;
 
       final lines = await src.readAsLines();
-      final recent = lines.length <= maxLines ? lines : lines.sublist(lines.length - maxLines);
+      final recent = lines.length <= maxLines
+          ? lines
+          : lines.sublist(lines.length - maxLines);
 
       final desktop = Directory(p.join(_homeDir(), 'Desktop'));
       if (!await desktop.exists()) {

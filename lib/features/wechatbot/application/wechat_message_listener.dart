@@ -18,14 +18,14 @@ class WeChatIncomingMessage {
     required this.rawSource,
   });
 
-  final String type;       // text, file, urlLink, friendship, unknown
-  final String content;    // 文本内容
-  final String fromId;     // 发送者ID
-  final String fromName;   // 发送者昵称
-  final String? roomId;    // 群ID（私聊为null）
-  final String? roomName;  // 群名
-  final bool isMentioned;  // 是否@了机器人
-  final bool isSelf;       // 是否自己发的
+  final String type; // text, file, urlLink, friendship, unknown
+  final String content; // 文本内容
+  final String fromId; // 发送者ID
+  final String fromName; // 发送者昵称
+  final String? roomId; // 群ID（私聊为null）
+  final String? roomName; // 群名
+  final bool isMentioned; // 是否@了机器人
+  final bool isSelf; // 是否自己发的
   final Map<String, dynamic> rawSource;
 
   bool get isPrivate => roomId == null || roomId!.isEmpty;
@@ -51,24 +51,32 @@ class WeChatMessageListener {
   Future<void> start() async {
     if (_server != null) return;
     try {
-      _server = await HttpServer.bind(InternetAddress.loopbackIPv4, callbackPort, shared: true);
+      _server = await HttpServer.bind(
+        InternetAddress.loopbackIPv4,
+        callbackPort,
+        shared: true,
+      );
       _server!.listen(_handleRequest);
-      await SupportLogger.log('wechat.listener', 'listener_started', extra: {
-        'callbackUrl': callbackUrl,
-        'port': callbackPort,
-      });
+      await SupportLogger.log(
+        'wechat.listener',
+        'listener_started',
+        extra: {'callbackUrl': callbackUrl, 'port': callbackPort},
+      );
     } catch (e) {
       // 端口已被占用（上次没关干净），忽略
-      await SupportLogger.log('wechat.listener', 'listener_start_failed', extra: {
-        'error': e.toString(),
-        'port': callbackPort,
-      });
+      await SupportLogger.log(
+        'wechat.listener',
+        'listener_start_failed',
+        extra: {'error': e.toString(), 'port': callbackPort},
+      );
     }
   }
 
   Future<void> _handleRequest(HttpRequest request) async {
     // ignore: avoid_print
-    print('[WeChatListener] ${request.method} ${request.uri.path} from ${request.connectionInfo?.remoteAddress.address}');
+    print(
+      '[WeChatListener] ${request.method} ${request.uri.path} from ${request.connectionInfo?.remoteAddress.address}',
+    );
 
     if (request.method != 'POST' || request.uri.path != '/callback') {
       request.response
@@ -134,7 +142,11 @@ class WeChatMessageListener {
       final sourceMentioned = source['isMentioned'];
       final sourceIsSelf = source['isMsgFromSelf'];
       final roomIdRaw = roomData?['id']?.toString();
-      final roomId = (roomIdRaw == null || roomIdRaw.isEmpty || roomIdRaw == 'null' || roomIdRaw == 'undefined')
+      final roomId =
+          (roomIdRaw == null ||
+              roomIdRaw.isEmpty ||
+              roomIdRaw == 'null' ||
+              roomIdRaw == 'undefined')
           ? null
           : roomIdRaw;
 
@@ -144,16 +156,20 @@ class WeChatMessageListener {
       final fromName = fromPayload['name']?.toString() ?? '';
       final fromIdRaw = from['id']?.toString() ?? '';
       // 优先用alias(wxid)，其次name，最后才用内部id
-      final effectiveFromId = fromAlias.isNotEmpty ? fromAlias
-          : fromName.isNotEmpty ? fromName
+      final effectiveFromId = fromAlias.isNotEmpty
+          ? fromAlias
+          : fromName.isNotEmpty
+          ? fromName
           : fromIdRaw;
 
       // 群名：先从 payload.topic，再从顶层 topic
-      final roomTopic = roomPayload['topic']?.toString()
-          ?? roomData?['topic']?.toString();
+      final roomTopic =
+          roomPayload['topic']?.toString() ?? roomData?['topic']?.toString();
 
       // ignore: avoid_print
-      print('[WeChatListener] from解析: id=$fromIdRaw alias=$fromAlias name=$fromName → effectiveId=$effectiveFromId roomTopic=$roomTopic');
+      print(
+        '[WeChatListener] from解析: id=$fromIdRaw alias=$fromAlias name=$fromName → effectiveId=$effectiveFromId roomTopic=$roomTopic',
+      );
 
       final message = WeChatIncomingMessage(
         type: type ?? 'unknown',
@@ -167,18 +183,26 @@ class WeChatMessageListener {
         rawSource: source,
       );
 
-      await SupportLogger.log('wechat.listener', 'incoming_parsed', extra: {
-        'type': message.type,
-        'isPrivate': message.isPrivate,
-        'isMentioned': message.isMentioned,
-        'isSelf': message.isSelf,
-        'fromId': message.fromId,
-        'roomId': message.roomId,
-        'contentPreview': message.content.length > 80 ? '${message.content.substring(0, 80)}...' : message.content,
-      });
+      await SupportLogger.log(
+        'wechat.listener',
+        'incoming_parsed',
+        extra: {
+          'type': message.type,
+          'isPrivate': message.isPrivate,
+          'isMentioned': message.isMentioned,
+          'isSelf': message.isSelf,
+          'fromId': message.fromId,
+          'roomId': message.roomId,
+          'contentPreview': message.content.length > 80
+              ? '${message.content.substring(0, 80)}...'
+              : message.content,
+        },
+      );
 
       // ignore: avoid_print
-      print('[WeChatListener] 解析完成: type=${message.type} isPrivate=${message.isPrivate} isMentioned=${message.isMentioned} isSelf=${message.isSelf} fromId=${message.fromId} roomId=${message.roomId} content=${message.content.length > 50 ? message.content.substring(0, 50) : message.content}');
+      print(
+        '[WeChatListener] 解析完成: type=${message.type} isPrivate=${message.isPrivate} isMentioned=${message.isMentioned} isSelf=${message.isSelf} fromId=${message.fromId} roomId=${message.roomId} content=${message.content.length > 50 ? message.content.substring(0, 50) : message.content}',
+      );
 
       // 不处理自己发的消息
       if (!message.isSelf) {
@@ -186,10 +210,11 @@ class WeChatMessageListener {
         print('[WeChatListener] → 转发到消息流');
         _controller.add(message);
       } else {
-        await SupportLogger.log('wechat.listener', 'incoming_ignored_self', extra: {
-          'fromId': message.fromId,
-          'roomId': message.roomId,
-        });
+        await SupportLogger.log(
+          'wechat.listener',
+          'incoming_ignored_self',
+          extra: {'fromId': message.fromId, 'roomId': message.roomId},
+        );
       }
 
       // 返回成功（不自动回复，由autopilot处理）
@@ -199,9 +224,11 @@ class WeChatMessageListener {
         ..write(jsonEncode({'success': true}))
         ..close();
     } catch (e) {
-      await SupportLogger.log('wechat.listener', 'incoming_parse_error', extra: {
-        'error': e.toString(),
-      });
+      await SupportLogger.log(
+        'wechat.listener',
+        'incoming_parse_error',
+        extra: {'error': e.toString()},
+      );
       request.response
         ..statusCode = 500
         ..write('error: $e')

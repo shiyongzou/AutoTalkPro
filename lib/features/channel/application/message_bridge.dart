@@ -24,11 +24,11 @@ class IncomingRawMessage {
   });
 
   final ChannelType channel;
-  final String peerId;       // 发送回复用的目标（私聊=昵称，群=room:群名）
-  final String peerName;     // 显示名
+  final String peerId; // 发送回复用的目标（私聊=昵称，群=room:群名）
+  final String peerName; // 显示名
   final String text;
   final DateTime receivedAt;
-  final String? customerId;  // 会话匹配用的ID（群里按人分：群名:发送者）
+  final String? customerId; // 会话匹配用的ID（群里按人分：群名:发送者）
 
   /// 用于会话匹配的ID——有customerId就用，否则用peerId
   String get conversationKey => customerId ?? peerId;
@@ -89,7 +89,9 @@ class MessageBridge {
   /// 处理一条消息
   Future<void> _handleOne(IncomingRawMessage raw) async {
     // ignore: avoid_print
-    print('[MessageBridge] 处理消息: channel=${raw.channel} peerId=${raw.peerId} text=${raw.text.length > 30 ? raw.text.substring(0, 30) : raw.text}');
+    print(
+      '[MessageBridge] 处理消息: channel=${raw.channel} peerId=${raw.peerId} text=${raw.text.length > 30 ? raw.text.substring(0, 30) : raw.text}',
+    );
     // 1. 找到或创建会话
     final conversation = await _getOrCreateConversation(raw);
 
@@ -116,7 +118,9 @@ class MessageBridge {
     final mode = _parseMode(conversation.autopilotMode);
 
     // ignore: avoid_print
-    print('[MessageBridge] 模式: autopilotMode=${conversation.autopilotMode} → mode=$mode');
+    print(
+      '[MessageBridge] 模式: autopilotMode=${conversation.autopilotMode} → mode=$mode',
+    );
 
     // 5. 不管什么模式都生成AI回复（手动模式生成但不发）
     final negotiation = await negotiationRepository.getByConversation(
@@ -134,7 +138,9 @@ class MessageBridge {
       );
 
       // ignore: avoid_print
-      print('[MessageBridge] AI回复: autoSend=${result.autoSend} qaPass=${result.qaResult?.pass} replyLen=${result.reply.content.length} provider=${result.reply.provider}');
+      print(
+        '[MessageBridge] AI回复: autoSend=${result.autoSend} qaPass=${result.qaResult?.pass} replyLen=${result.reply.content.length} provider=${result.reply.provider}',
+      );
 
       final replyForSend = _withEmojiTone(result.reply.content, raw.channel);
 
@@ -183,7 +189,9 @@ class MessageBridge {
           }
         }
         // ignore: avoid_print
-        print('[MessageBridge] 发送回复: adapter=${adapter.runtimeType} peerId=${raw.peerId} textLen=${finalReply.length}');
+        print(
+          '[MessageBridge] 发送回复: adapter=${adapter.runtimeType} peerId=${raw.peerId} textLen=${finalReply.length}',
+        );
         final sent = await adapter.sendMessage(
           peerId: raw.peerId,
           text: finalReply,
@@ -308,7 +316,10 @@ class MessageBridge {
     if (text.runes.length > 90) return text;
 
     const emojiPool = ['😊', '👌', '👍', '✨'];
-    final idx = text.runes.fold<int>(0, (acc, r) => (acc + r) % emojiPool.length);
+    final idx = text.runes.fold<int>(
+      0,
+      (acc, r) => (acc + r) % emojiPool.length,
+    );
     final emoji = emojiPool[idx];
 
     if (text.endsWith('。') || text.endsWith('！') || text.endsWith('!')) {

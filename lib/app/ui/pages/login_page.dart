@@ -86,8 +86,8 @@ class _LoginPageState extends State<LoginPage> {
           child: _bootstrapping
               ? _buildBootstrapProgress(scheme)
               : selectedChannel == null
-                  ? _buildChannelSelect(scheme)
-                  : _buildLoginForm(scheme),
+              ? _buildChannelSelect(scheme)
+              : _buildLoginForm(scheme),
         ),
       ),
     );
@@ -99,10 +99,7 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         Icon(Icons.downloading_outlined, size: 48, color: scheme.primary),
         const SizedBox(height: 20),
-        Text(
-          '首次使用，正在准备环境',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        Text('首次使用，正在准备环境', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
         Text(
           '下载 Node.js 运行环境和服务依赖，仅首次需要',
@@ -121,7 +118,8 @@ class _LoginPageState extends State<LoginPage> {
           child: Row(
             children: [
               const SizedBox(
-                width: 16, height: 16,
+                width: 16,
+                height: 16,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
               const SizedBox(width: 12),

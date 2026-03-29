@@ -4,7 +4,8 @@ import '../domain/ai_provider.dart';
 import '../domain/ai_settings_repository.dart';
 
 class LocalAiSettingsRepository implements AiSettingsRepository {
-  LocalAiSettingsRepository({required SharedPreferences prefs}) : _prefs = prefs;
+  LocalAiSettingsRepository({required SharedPreferences prefs})
+    : _prefs = prefs;
 
   final SharedPreferences _prefs;
 

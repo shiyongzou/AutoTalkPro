@@ -33,7 +33,8 @@ class CustomerProfile {
   final String? industry;
   final String? budgetLevel; // 'low', 'medium', 'high', 'enterprise'
   final bool isDecisionMaker;
-  final String lifeCycleStage; // 'lead', 'prospect', 'opportunity', 'customer', 'churned'
+  final String
+  lifeCycleStage; // 'lead', 'prospect', 'opportunity', 'customer', 'churned'
   final int riskScore; // 0-100
   final String? notes;
   final String? preferredChannel; // 'telegram', 'wecom'

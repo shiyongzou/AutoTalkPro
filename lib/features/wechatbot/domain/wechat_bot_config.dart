@@ -19,9 +19,12 @@ class WeChatBotConfig {
   /// 是否启用
   final bool enabled;
 
-  String get sendUrl => '${apiBase.replaceAll(RegExp(r'/+$'), '')}/webhook/msg/v2?token=$token';
-  String get loginUrl => '${apiBase.replaceAll(RegExp(r'/+$'), '')}/login?token=$token';
-  String get healthUrl => '${apiBase.replaceAll(RegExp(r'/+$'), '')}/healthz?token=$token';
+  String get sendUrl =>
+      '${apiBase.replaceAll(RegExp(r'/+$'), '')}/webhook/msg/v2?token=$token';
+  String get loginUrl =>
+      '${apiBase.replaceAll(RegExp(r'/+$'), '')}/login?token=$token';
+  String get healthUrl =>
+      '${apiBase.replaceAll(RegExp(r'/+$'), '')}/healthz?token=$token';
 
   static WeChatBotConfig defaults() => const WeChatBotConfig(
     apiBase: 'http://localhost:3001',

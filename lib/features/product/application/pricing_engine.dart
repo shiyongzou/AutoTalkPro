@@ -38,11 +38,14 @@ class PricingEngine {
     if (product == null || !product.isActive) return null;
 
     final rules = await productRepository.getRulesForProduct(productId);
-    final validRules = rules
-        .where((r) => r.isCurrentlyValid)
-        .where((r) => quantity >= r.minQuantity && quantity <= r.maxQuantity)
-        .toList()
-      ..sort((a, b) => b.discountPercent.compareTo(a.discountPercent));
+    final validRules =
+        rules
+            .where((r) => r.isCurrentlyValid)
+            .where(
+              (r) => quantity >= r.minQuantity && quantity <= r.maxQuantity,
+            )
+            .toList()
+          ..sort((a, b) => b.discountPercent.compareTo(a.discountPercent));
 
     if (validRules.isEmpty) {
       return PriceQuote(
@@ -61,7 +64,8 @@ class PricingEngine {
     PriceRule bestRule = validRules.first;
     if (customerBudget != null) {
       for (final rule in validRules) {
-        final price = product.basePrice * (1 - rule.discountPercent / 100) * quantity;
+        final price =
+            product.basePrice * (1 - rule.discountPercent / 100) * quantity;
         if (price <= customerBudget && price >= product.floorPrice * quantity) {
           bestRule = rule;
           break;
@@ -69,7 +73,8 @@ class PricingEngine {
       }
     }
 
-    final quotedPrice = product.basePrice * (1 - bestRule.discountPercent / 100) * quantity;
+    final quotedPrice =
+        product.basePrice * (1 - bestRule.discountPercent / 100) * quantity;
     final isAboveFloor = quotedPrice >= product.floorPrice * quantity;
 
     return PriceQuote(

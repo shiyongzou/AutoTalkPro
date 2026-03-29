@@ -4,7 +4,7 @@ import '../application/telegram_service_manager.dart';
 /// 真实的Telegram适配器——通过本地GramJS服务收发消息
 class GramJsTelegramAdapter implements ChannelAdapter {
   GramJsTelegramAdapter({TelegramServiceManager? manager})
-      : _manager = manager ?? TelegramServiceManager();
+    : _manager = manager ?? TelegramServiceManager();
 
   final TelegramServiceManager _manager;
 
@@ -20,7 +20,10 @@ class GramJsTelegramAdapter implements ChannelAdapter {
   }
 
   @override
-  Future<bool> sendMessage({required String peerId, required String text}) async {
+  Future<bool> sendMessage({
+    required String peerId,
+    required String text,
+  }) async {
     return _manager.sendMessage(peerId: peerId, text: text);
   }
 

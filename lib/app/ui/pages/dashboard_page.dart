@@ -33,19 +33,29 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _load() async {
-    final conversations = await widget.appContext.conversationRepository.listConversations();
-    final customers = await widget.appContext.conversationRepository.listCustomers();
+    final conversations = await widget.appContext.conversationRepository
+        .listConversations();
+    final customers = await widget.appContext.conversationRepository
+        .listCustomers();
     final orders = await widget.appContext.orderRepository.listAll();
     final activeOrd = await widget.appContext.orderRepository.activeCount();
-    final pendingEsc = await widget.appContext.escalationRepository.pendingCount();
+    final pendingEsc = await widget.appContext.escalationRepository
+        .pendingCount();
 
     final revenue = orders
-        .where((o) => o.status == OrderStatus.completed ||
-                      o.status == OrderStatus.delivered ||
-                      o.status == OrderStatus.paid)
+        .where(
+          (o) =>
+              o.status == OrderStatus.completed ||
+              o.status == OrderStatus.delivered ||
+              o.status == OrderStatus.paid,
+        )
         .fold<double>(0, (s, o) => s + o.totalAmount);
-    final completed = orders.where((o) => o.status == OrderStatus.completed).length;
-    final cancelled = orders.where((o) => o.status == OrderStatus.cancelled).length;
+    final completed = orders
+        .where((o) => o.status == OrderStatus.completed)
+        .length;
+    final cancelled = orders
+        .where((o) => o.status == OrderStatus.cancelled)
+        .length;
 
     if (!mounted) return;
     setState(() {
@@ -74,10 +84,7 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const AppPanelHeader(
-              title: '数据大盘',
-              subtitle: '实时业务概览，一眼掌握核心指标。',
-            ),
+            const AppPanelHeader(title: '数据大盘', subtitle: '实时业务概览，一眼掌握核心指标。'),
 
             // 核心指标卡片
             Wrap(
@@ -147,19 +154,45 @@ class _DashboardPageState extends State<DashboardPage> {
             // 转化漏斗
             Tooltip(
               message: '从获客到成交的转化路径',
-              child: Text('转化漏斗', style: Theme.of(context).textTheme.titleSmall),
+              child: Text(
+                '转化漏斗',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
             ),
             SizedBox(height: tokens.spaceSm),
-            _FunnelBar(label: '客户', count: totalCustomers, maxCount: totalCustomers, color: Colors.blue),
-            _FunnelBar(label: '会话', count: totalConversations, maxCount: totalCustomers, color: Colors.purple),
-            _FunnelBar(label: '订单', count: totalOrders, maxCount: totalCustomers, color: Colors.orange),
-            _FunnelBar(label: '成交', count: completedOrders, maxCount: totalCustomers, color: Colors.green),
+            _FunnelBar(
+              label: '客户',
+              count: totalCustomers,
+              maxCount: totalCustomers,
+              color: Colors.blue,
+            ),
+            _FunnelBar(
+              label: '会话',
+              count: totalConversations,
+              maxCount: totalCustomers,
+              color: Colors.purple,
+            ),
+            _FunnelBar(
+              label: '订单',
+              count: totalOrders,
+              maxCount: totalCustomers,
+              color: Colors.orange,
+            ),
+            _FunnelBar(
+              label: '成交',
+              count: completedOrders,
+              maxCount: totalCustomers,
+              color: Colors.green,
+            ),
             SizedBox(height: tokens.spaceLg),
 
             // 最近订单
             Tooltip(
               message: '最近10笔订单的状态',
-              child: Text('最近订单', style: Theme.of(context).textTheme.titleSmall),
+              child: Text(
+                '最近订单',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
             ),
             SizedBox(height: tokens.spaceSm),
             if (recentOrders.isEmpty)
@@ -168,30 +201,44 @@ class _DashboardPageState extends State<DashboardPage> {
                 child: Text('暂无订单数据', style: TextStyle(color: Colors.grey)),
               )
             else
-              ...recentOrders.map((order) => Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 120,
-                      child: Text(order.customerName, style: const TextStyle(fontSize: 12)),
-                    ),
-                    Expanded(
-                      child: Text(
-                        order.items.map((i) => i.productName).join(', '),
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
-                        overflow: TextOverflow.ellipsis,
+              ...recentOrders.map(
+                (order) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 120,
+                        child: Text(
+                          order.customerName,
+                          style: const TextStyle(fontSize: 12),
+                        ),
                       ),
-                    ),
-                    Text(
-                      '${order.currency}${order.totalAmount.toStringAsFixed(0)}',
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(width: 8),
-                    AppStatusTag(label: order.statusLabel, tone: _orderTone(order.status)),
-                  ],
+                      Expanded(
+                        child: Text(
+                          order.items.map((i) => i.productName).join(', '),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        '${order.currency}${order.totalAmount.toStringAsFixed(0)}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      AppStatusTag(
+                        label: order.statusLabel,
+                        tone: _orderTone(order.status),
+                      ),
+                    ],
+                  ),
                 ),
-              )),
+              ),
             SizedBox(height: tokens.spaceMd),
             Center(
               child: OutlinedButton.icon(
@@ -208,13 +255,17 @@ class _DashboardPageState extends State<DashboardPage> {
 
   AppStatusTone _orderTone(OrderStatus s) {
     switch (s) {
-      case OrderStatus.completed: return AppStatusTone.success;
+      case OrderStatus.completed:
+        return AppStatusTone.success;
       case OrderStatus.paid:
-      case OrderStatus.delivered: return AppStatusTone.success;
+      case OrderStatus.delivered:
+        return AppStatusTone.success;
       case OrderStatus.pending:
-      case OrderStatus.confirmed: return AppStatusTone.warning;
+      case OrderStatus.confirmed:
+        return AppStatusTone.warning;
       case OrderStatus.cancelled:
-      case OrderStatus.refunded: return AppStatusTone.danger;
+      case OrderStatus.refunded:
+        return AppStatusTone.danger;
     }
   }
 }
@@ -250,7 +301,10 @@ class _MetricCard extends StatelessWidget {
                   children: [
                     Icon(icon, size: 20, color: color),
                     const SizedBox(width: 8),
-                    Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                    Text(
+                      label,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -292,7 +346,10 @@ class _FunnelBar extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 6),
       child: Row(
         children: [
-          SizedBox(width: 50, child: Text(label, style: const TextStyle(fontSize: 12))),
+          SizedBox(
+            width: 50,
+            child: Text(label, style: const TextStyle(fontSize: 12)),
+          ),
           Expanded(
             child: Stack(
               children: [
@@ -315,7 +372,11 @@ class _FunnelBar extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 8),
                     child: Text(
                       '$count',
-                      style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),

@@ -16,8 +16,12 @@ class DriftScriptRepository implements ScriptRepository {
       '''INSERT OR REPLACE INTO script_templates(id,category,title,content,tags_json,use_count,created_at,updated_at)
          VALUES (?,?,?,?,?,?,?,?)''',
       [
-        script.id, script.category.name, script.title, script.content,
-        jsonEncode(script.tags), script.useCount,
+        script.id,
+        script.category.name,
+        script.title,
+        script.content,
+        jsonEncode(script.tags),
+        script.useCount,
         script.createdAt.millisecondsSinceEpoch,
         script.updatedAt.millisecondsSinceEpoch,
       ],
@@ -26,25 +30,33 @@ class DriftScriptRepository implements ScriptRepository {
 
   @override
   Future<void> delete(String id) async {
-    await _db.customStatement('DELETE FROM script_templates WHERE id = ?', [id]);
+    await _db.customStatement('DELETE FROM script_templates WHERE id = ?', [
+      id,
+    ]);
   }
 
   @override
   Future<List<ScriptTemplate>> listAll() async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM script_templates ORDER BY use_count DESC, updated_at DESC',
-      readsFrom: {},
-    ).get();
+    final rows = await _db
+        .customSelect(
+          'SELECT * FROM script_templates ORDER BY use_count DESC, updated_at DESC',
+          readsFrom: {},
+        )
+        .get();
     return rows.map(_fromRow).toList();
   }
 
   @override
-  Future<List<ScriptTemplate>> listByCategory(SalesScriptCategory category) async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM script_templates WHERE category = ? ORDER BY use_count DESC',
-      variables: [Variable(category.name)],
-      readsFrom: {},
-    ).get();
+  Future<List<ScriptTemplate>> listByCategory(
+    SalesScriptCategory category,
+  ) async {
+    final rows = await _db
+        .customSelect(
+          'SELECT * FROM script_templates WHERE category = ? ORDER BY use_count DESC',
+          variables: [Variable(category.name)],
+          readsFrom: {},
+        )
+        .get();
     return rows.map(_fromRow).toList();
   }
 
@@ -67,8 +79,12 @@ class DriftScriptRepository implements ScriptRepository {
       content: row.read<String>('content'),
       tags: (jsonDecode(row.read<String>('tags_json')) as List).cast<String>(),
       useCount: row.read<int>('use_count'),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(row.read<int>('created_at')),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.read<int>('updated_at')),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(
+        row.read<int>('created_at'),
+      ),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(
+        row.read<int>('updated_at'),
+      ),
     );
   }
 }

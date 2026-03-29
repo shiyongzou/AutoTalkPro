@@ -103,64 +103,154 @@ class AiProviderSettings {
   );
 
   /// 平台列表（每个平台下有多个模型可选）
-  static const List<({String id, String label, String apiBase, String description, List<String> models})> platforms = [
+  static const List<
+    ({
+      String id,
+      String label,
+      String apiBase,
+      String description,
+      List<String> models,
+    })
+  >
+  platforms = [
     (
-      id: 'openai', label: 'OpenAI', apiBase: 'https://api.openai.com',
+      id: 'openai',
+      label: 'OpenAI',
+      apiBase: 'https://api.openai.com',
       description: '最聪明的模型，需要海外网络',
-      models: ['gpt-5.4', 'gpt-5.4-mini', 'gpt-5.4-pro', 'gpt-5', 'gpt-5-mini', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4o', 'gpt-4o-mini', 'o3-mini'],
+      models: [
+        'gpt-5.4',
+        'gpt-5.4-mini',
+        'gpt-5.4-pro',
+        'gpt-5',
+        'gpt-5-mini',
+        'gpt-4.1',
+        'gpt-4.1-mini',
+        'gpt-4o',
+        'gpt-4o-mini',
+        'o3-mini',
+      ],
     ),
     (
-      id: 'anthropic', label: 'Claude', apiBase: 'https://api.anthropic.com',
+      id: 'anthropic',
+      label: 'Claude',
+      apiBase: 'https://api.anthropic.com',
       description: 'Anthropic出品，代码和推理最强',
-      models: ['claude-opus-4-6', 'claude-sonnet-4-6', 'claude-haiku-4-5', 'claude-sonnet-4-5-20241022', 'claude-3-opus-20240229'],
+      models: [
+        'claude-opus-4-6',
+        'claude-sonnet-4-6',
+        'claude-haiku-4-5',
+        'claude-sonnet-4-5-20241022',
+        'claude-3-opus-20240229',
+      ],
     ),
     (
-      id: 'deepseek', label: 'DeepSeek', apiBase: 'https://api.deepseek.com',
+      id: 'deepseek',
+      label: 'DeepSeek',
+      apiBase: 'https://api.deepseek.com',
       description: '国产最强，中文好，便宜，推荐',
-      models: ['deepseek-chat', 'deepseek-reasoner', 'DeepSeek-V3', 'DeepSeek-V3.2', 'DeepSeek-R1', 'DeepSeek-R1-0528', 'DeepSeek-Prover-V2-671B'],
+      models: [
+        'deepseek-chat',
+        'deepseek-reasoner',
+        'DeepSeek-V3',
+        'DeepSeek-V3.2',
+        'DeepSeek-R1',
+        'DeepSeek-R1-0528',
+        'DeepSeek-Prover-V2-671B',
+      ],
     ),
     (
-      id: 'qwen', label: '通义千问', apiBase: 'https://dashscope.aliyuncs.com/compatible-mode',
+      id: 'qwen',
+      label: '通义千问',
+      apiBase: 'https://dashscope.aliyuncs.com/compatible-mode',
       description: '阿里出品，国内直连',
-      models: ['qwen3-235b-a22b', 'qwen-max', 'qwen-plus', 'qwen-turbo', 'qwen-long', 'qwen2.5-72b-instruct', 'qwen2.5-32b-instruct'],
+      models: [
+        'qwen3-235b-a22b',
+        'qwen-max',
+        'qwen-plus',
+        'qwen-turbo',
+        'qwen-long',
+        'qwen2.5-72b-instruct',
+        'qwen2.5-32b-instruct',
+      ],
     ),
     (
-      id: 'moonshot', label: 'Moonshot / Kimi', apiBase: 'https://api.moonshot.cn',
+      id: 'moonshot',
+      label: 'Moonshot / Kimi',
+      apiBase: 'https://api.moonshot.cn',
       description: '月之暗面，擅长长文本',
       models: ['moonshot-v1-8k', 'moonshot-v1-32k', 'moonshot-v1-128k'],
     ),
     (
-      id: 'glm', label: '智谱GLM', apiBase: 'https://open.bigmodel.cn/api/paas',
+      id: 'glm',
+      label: '智谱GLM',
+      apiBase: 'https://open.bigmodel.cn/api/paas',
       description: '清华团队，中文自然',
-      models: ['glm-4-plus', 'glm-4', 'glm-4-flash', 'glm-4-air', 'glm-4-long', 'glm-4v', 'glm-3-turbo'],
+      models: [
+        'glm-4-plus',
+        'glm-4',
+        'glm-4-flash',
+        'glm-4-air',
+        'glm-4-long',
+        'glm-4v',
+        'glm-3-turbo',
+      ],
     ),
     (
-      id: 'doubao', label: '豆包', apiBase: 'https://ark.cn-beijing.volces.com/api',
+      id: 'doubao',
+      label: '豆包',
+      apiBase: 'https://ark.cn-beijing.volces.com/api',
       description: '字节出品，速度最快',
-      models: ['doubao-pro-256k', 'doubao-pro-32k', 'doubao-pro-4k', 'doubao-lite-32k', 'doubao-lite-4k'],
+      models: [
+        'doubao-pro-256k',
+        'doubao-pro-32k',
+        'doubao-pro-4k',
+        'doubao-lite-32k',
+        'doubao-lite-4k',
+      ],
     ),
     (
-      id: 'minimax', label: 'MiniMax', apiBase: 'https://api.minimax.chat',
+      id: 'minimax',
+      label: 'MiniMax',
+      apiBase: 'https://api.minimax.chat',
       description: '海螺AI，多模态能力强',
       models: ['MiniMax-Text-01', 'abab6.5s-chat'],
     ),
     (
-      id: 'ollama', label: 'Ollama本地', apiBase: 'http://localhost:11434',
+      id: 'ollama',
+      label: 'Ollama本地',
+      apiBase: 'http://localhost:11434',
       description: '本地运行，完全免费，不联网',
-      models: ['qwen2.5', 'qwen3', 'llama3.3', 'deepseek-r1', 'deepseek-v3', 'mistral', 'gemma2', 'phi4', 'command-r'],
+      models: [
+        'qwen2.5',
+        'qwen3',
+        'llama3.3',
+        'deepseek-r1',
+        'deepseek-v3',
+        'mistral',
+        'gemma2',
+        'phi4',
+        'command-r',
+      ],
     ),
   ];
 
   /// 兼容旧代码的presets（从platforms生成）
-  static final List<({String key, String label, AiProviderSettings settings})> presets =
-      platforms.expand((p) => p.models.map((m) => (
-        key: m,
-        label: '${p.label} / $m',
-        settings: AiProviderSettings(
-          provider: AiProviderType.openaiCompatible,
-          model: m,
-          apiBase: p.apiBase,
-          temperature: 0.7,
+  static final List<({String key, String label, AiProviderSettings settings})>
+  presets = platforms
+      .expand(
+        (p) => p.models.map(
+          (m) => (
+            key: m,
+            label: '${p.label} / $m',
+            settings: AiProviderSettings(
+              provider: AiProviderType.openaiCompatible,
+              model: m,
+              apiBase: p.apiBase,
+              temperature: 0.7,
+            ),
+          ),
         ),
-      ))).toList();
+      )
+      .toList();
 }

@@ -14,7 +14,7 @@ class WeChatServiceManager {
   }
 
   WeChatServiceManager._({http.Client? httpClient})
-      : _client = httpClient ?? http.Client();
+    : _client = httpClient ?? http.Client();
 
   static WeChatServiceManager? _instance;
 
@@ -25,7 +25,9 @@ class WeChatServiceManager {
   static const int port = 3001;
   static const int callbackPort = 3002;
   static const String token = 'ai_trade_local';
-  static final String _qrFilePath = PlatformUtils.tempFilePath('.wechat_qr_output');
+  static final String _qrFilePath = PlatformUtils.tempFilePath(
+    '.wechat_qr_output',
+  );
 
   String get baseUrl => 'http://localhost:$port';
   String get healthUrl => '$baseUrl/healthz?token=$token';
@@ -36,8 +38,7 @@ class WeChatServiceManager {
   String get _entryPath => ServiceBootstrapper.wechatEntryPath;
 
   bool get isReady =>
-      File(_nodePath).existsSync() &&
-      File(_entryPath).existsSync();
+      File(_nodePath).existsSync() && File(_entryPath).existsSync();
 
   /// 读取QR码
   String? get qrCodeText {
@@ -45,8 +46,10 @@ class WeChatServiceManager {
       final f = File(_qrFilePath);
       if (!f.existsSync()) return null;
       final content = f.readAsStringSync();
-      final qrLines = content.split('\n').where((line) =>
-          line.contains('█') || line.contains('▄')).toList();
+      final qrLines = content
+          .split('\n')
+          .where((line) => line.contains('█') || line.contains('▄'))
+          .toList();
       return qrLines.length >= 10 ? qrLines.join('\n') : null;
     } catch (_) {
       return null;
@@ -78,14 +81,14 @@ class WeChatServiceManager {
 
   /// 构造环境变量（直接传给进程，不依赖.env文件位置）
   Map<String, String> _buildEnv() => {
-        ...Platform.environment,
-        'PORT': '$port',
-        'LOG_LEVEL': 'info',
-        'DISABLE_AUTO_LOGIN': '',
-        'ACCEPT_RECVD_MSG_MYSELF': 'false',
-        'LOCAL_RECVD_MSG_API': 'http://localhost:$callbackPort/callback',
-        'LOCAL_LOGIN_API_TOKEN': token,
-      };
+    ...Platform.environment,
+    'PORT': '$port',
+    'LOG_LEVEL': 'info',
+    'DISABLE_AUTO_LOGIN': '',
+    'ACCEPT_RECVD_MSG_MYSELF': 'false',
+    'LOCAL_RECVD_MSG_API': 'http://localhost:$callbackPort/callback',
+    'LOCAL_LOGIN_API_TOKEN': token,
+  };
 
   /// 写配置文件（兜底：写到工作目录的.env）
   Future<void> _writeEnvFile() async {
@@ -116,7 +119,9 @@ LOCAL_LOGIN_API_TOKEN=$token
 
     // 自动引导环境（首次下载Node+依赖）
     if (!isReady) {
-      final boot = await ServiceBootstrapper.instance.bootstrapService('wechat_service');
+      final boot = await ServiceBootstrapper.instance.bootstrapService(
+        'wechat_service',
+      );
       if (!boot.ok) return (ok: false, message: boot.message);
     }
     if (!isReady) {
@@ -143,11 +148,12 @@ LOCAL_LOGIN_API_TOKEN=$token
       _sink = qrFile.openWrite();
       _process!.stdout.listen(
         (data) => _sink?.add(data),
-        onDone: () { _sink?.close(); _sink = null; },
+        onDone: () {
+          _sink?.close();
+          _sink = null;
+        },
       );
-      _process!.stderr.listen(
-        (data) => _sink?.add(data),
-      );
+      _process!.stderr.listen((data) => _sink?.add(data));
 
       // 等服务启动
       for (int i = 0; i < 15; i++) {

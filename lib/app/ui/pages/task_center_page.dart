@@ -36,7 +36,9 @@ class _TaskCenterPageState extends State<TaskCenterPage> {
 
     final active = conversations.where((c) => c.status == 'active').length;
     final closing = conversations.where((c) => c.goalStage == 'closing').length;
-    final proposal = conversations.where((c) => c.goalStage == 'proposal').length;
+    final proposal = conversations
+        .where((c) => c.goalStage == 'proposal')
+        .length;
 
     return AppSurfaceCard(
       child: Column(
@@ -52,14 +54,19 @@ class _TaskCenterPageState extends State<TaskCenterPage> {
             children: [
               SizedBox(
                 width: 140,
-                child: AppMetricTile(label: '会话总数', value: '${conversations.length}'),
+                child: AppMetricTile(
+                  label: '会话总数',
+                  value: '${conversations.length}',
+                ),
               ),
               SizedBox(
                 width: 140,
                 child: AppMetricTile(
                   label: '进行中',
                   value: '$active',
-                  tone: active > 0 ? AppStatusTone.success : AppStatusTone.neutral,
+                  tone: active > 0
+                      ? AppStatusTone.success
+                      : AppStatusTone.neutral,
                 ),
               ),
               SizedBox(
@@ -67,7 +74,9 @@ class _TaskCenterPageState extends State<TaskCenterPage> {
                 child: AppMetricTile(
                   label: '报价阶段',
                   value: '$proposal',
-                  tone: proposal > 0 ? AppStatusTone.warning : AppStatusTone.neutral,
+                  tone: proposal > 0
+                      ? AppStatusTone.warning
+                      : AppStatusTone.neutral,
                 ),
               ),
               SizedBox(
@@ -75,7 +84,9 @@ class _TaskCenterPageState extends State<TaskCenterPage> {
                 child: AppMetricTile(
                   label: '成交阶段',
                   value: '$closing',
-                  tone: closing > 0 ? AppStatusTone.success : AppStatusTone.neutral,
+                  tone: closing > 0
+                      ? AppStatusTone.success
+                      : AppStatusTone.neutral,
                 ),
               ),
             ],
@@ -89,7 +100,9 @@ class _TaskCenterPageState extends State<TaskCenterPage> {
           SizedBox(height: tokens.spaceMd),
           Expanded(
             child: conversations.isEmpty
-                ? const Center(child: Text('暂无任务，先在 Conversation Center 创建示例会话'))
+                ? const Center(
+                    child: Text('暂无任务，先在 Conversation Center 创建示例会话'),
+                  )
                 : ListView.builder(
                     itemCount: conversations.length,
                     itemBuilder: (context, index) {
@@ -118,7 +131,12 @@ class _TaskCenterPageState extends State<TaskCenterPage> {
                         leading: const Icon(Icons.task_alt_outlined),
                         title: Row(
                           children: [
-                            Flexible(child: Text(c.title, overflow: TextOverflow.ellipsis)),
+                            Flexible(
+                              child: Text(
+                                c.title,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                             SizedBox(width: tokens.spaceSm),
                             AppStatusTag(label: stageLabel, tone: stageTone),
                           ],

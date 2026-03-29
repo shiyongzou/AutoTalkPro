@@ -71,9 +71,14 @@ class _OrderCenterPageState extends State<OrderCenterPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('确认取消'),
-        content: Text('确定要取消订单 ${order.id.length > 15 ? '${order.id.substring(0, 15)}...' : order.id} 吗？'),
+        content: Text(
+          '确定要取消订单 ${order.id.length > 15 ? '${order.id.substring(0, 15)}...' : order.id} 吗？',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('返回')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('返回'),
+          ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -114,15 +119,34 @@ class _OrderCenterPageState extends State<OrderCenterPage> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: methodCtl, decoration: const InputDecoration(labelText: '交付方式', border: OutlineInputBorder())),
+            TextField(
+              controller: methodCtl,
+              decoration: const InputDecoration(
+                labelText: '交付方式',
+                border: OutlineInputBorder(),
+              ),
+            ),
             const SizedBox(height: 12),
-            TextField(controller: infoCtl, decoration: const InputDecoration(labelText: '交付详情(链接/快递号等)', border: OutlineInputBorder()), maxLines: 2),
+            TextField(
+              controller: infoCtl,
+              decoration: const InputDecoration(
+                labelText: '交付详情(链接/快递号等)',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 2,
+            ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('取消'),
+          ),
           FilledButton(
-            onPressed: () => Navigator.pop(ctx, {'method': methodCtl.text, 'info': infoCtl.text}),
+            onPressed: () => Navigator.pop(ctx, {
+              'method': methodCtl.text,
+              'info': infoCtl.text,
+            }),
             child: const Text('确认交付'),
           ),
         ],
@@ -135,7 +159,12 @@ class _OrderCenterPageState extends State<OrderCenterPage> {
     final tokens = Theme.of(context).extension<AppThemeTokens>()!;
     final filtered = filteredOrders;
     final totalRevenue = orders
-        .where((o) => o.status == OrderStatus.completed || o.status == OrderStatus.delivered || o.status == OrderStatus.paid)
+        .where(
+          (o) =>
+              o.status == OrderStatus.completed ||
+              o.status == OrderStatus.delivered ||
+              o.status == OrderStatus.paid,
+        )
         .fold<double>(0, (s, o) => s + o.totalAmount);
 
     return AppSurfaceCard(
@@ -150,13 +179,18 @@ class _OrderCenterPageState extends State<OrderCenterPage> {
             spacing: tokens.spaceSm,
             runSpacing: tokens.spaceSm,
             children: [
-              SizedBox(width: 140, child: AppMetricTile(label: '总订单', value: '${orders.length}')),
+              SizedBox(
+                width: 140,
+                child: AppMetricTile(label: '总订单', value: '${orders.length}'),
+              ),
               SizedBox(
                 width: 140,
                 child: AppMetricTile(
                   label: '进行中',
                   value: '$activeCount',
-                  tone: activeCount > 0 ? AppStatusTone.warning : AppStatusTone.neutral,
+                  tone: activeCount > 0
+                      ? AppStatusTone.warning
+                      : AppStatusTone.neutral,
                 ),
               ),
               SizedBox(
@@ -174,11 +208,22 @@ class _OrderCenterPageState extends State<OrderCenterPage> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                for (final s in ['all', 'pending', 'confirmed', 'paid', 'delivered', 'completed', 'cancelled'])
+                for (final s in [
+                  'all',
+                  'pending',
+                  'confirmed',
+                  'paid',
+                  'delivered',
+                  'completed',
+                  'cancelled',
+                ])
                   Padding(
                     padding: const EdgeInsets.only(right: 4),
                     child: FilterChip(
-                      label: Text(s == 'all' ? '全部' : _statusLabel(s), style: const TextStyle(fontSize: 11)),
+                      label: Text(
+                        s == 'all' ? '全部' : _statusLabel(s),
+                        style: const TextStyle(fontSize: 11),
+                      ),
                       selected: filterStatus == s,
                       onSelected: (_) => setState(() => filterStatus = s),
                       visualDensity: VisualDensity.compact,
@@ -196,7 +241,11 @@ class _OrderCenterPageState extends State<OrderCenterPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey.shade300),
+                        Icon(
+                          Icons.receipt_long_outlined,
+                          size: 48,
+                          color: Colors.grey.shade300,
+                        ),
                         const SizedBox(height: 8),
                         const Text('暂无订单'),
                       ],
@@ -209,13 +258,18 @@ class _OrderCenterPageState extends State<OrderCenterPage> {
                       return _OrderCard(
                         order: order,
                         onConfirmPayment: order.status == OrderStatus.confirmed
-                            ? () => _confirmPayment(order) : null,
+                            ? () => _confirmPayment(order)
+                            : null,
                         onDeliver: order.status == OrderStatus.paid
-                            ? () => _markDelivered(order) : null,
+                            ? () => _markDelivered(order)
+                            : null,
                         onComplete: order.status == OrderStatus.delivered
-                            ? () => _markCompleted(order) : null,
-                        onCancel: order.isActive && order.status != OrderStatus.paid
-                            ? () => _cancelOrder(order) : null,
+                            ? () => _markCompleted(order)
+                            : null,
+                        onCancel:
+                            order.isActive && order.status != OrderStatus.paid
+                            ? () => _cancelOrder(order)
+                            : null,
                       );
                     },
                   ),
@@ -277,11 +331,19 @@ class _OrderCard extends StatelessWidget {
                     children: [
                       Text(
                         order.customerName,
-                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
                       ),
                       Text(
-                        order.items.map((i) => '${i.productName} x${i.quantity}').join(', '),
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        order.items
+                            .map((i) => '${i.productName} x${i.quantity}')
+                            .join(', '),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
@@ -310,11 +372,17 @@ class _OrderCard extends StatelessWidget {
                 ),
                 if (order.paymentMethod != null) ...[
                   const SizedBox(width: 12),
-                  Text('付: ${order.paymentMethod}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                  Text(
+                    '付: ${order.paymentMethod}',
+                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
                 ],
                 if (order.deliveryMethod != null) ...[
                   const SizedBox(width: 12),
-                  Text('发: ${order.deliveryMethod}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                  Text(
+                    '发: ${order.deliveryMethod}',
+                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
                 ],
                 const Spacer(),
                 if (onConfirmPayment != null)
@@ -322,14 +390,24 @@ class _OrderCard extends StatelessWidget {
                     onPressed: onConfirmPayment,
                     icon: const Icon(Icons.payment, size: 14),
                     label: const Text('确认收款', style: TextStyle(fontSize: 12)),
-                    style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6)),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                    ),
                   ),
                 if (onDeliver != null)
                   FilledButton.icon(
                     onPressed: onDeliver,
                     icon: const Icon(Icons.local_shipping, size: 14),
                     label: const Text('交付', style: TextStyle(fontSize: 12)),
-                    style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6)),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                    ),
                   ),
                 if (onComplete != null)
                   FilledButton.icon(
@@ -337,7 +415,10 @@ class _OrderCard extends StatelessWidget {
                     icon: const Icon(Icons.check_circle, size: 14),
                     label: const Text('完成', style: TextStyle(fontSize: 12)),
                     style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       backgroundColor: Colors.green,
                     ),
                   ),
@@ -345,7 +426,10 @@ class _OrderCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   TextButton(
                     onPressed: onCancel,
-                    child: const Text('取消', style: TextStyle(fontSize: 12, color: Colors.red)),
+                    child: const Text(
+                      '取消',
+                      style: TextStyle(fontSize: 12, color: Colors.red),
+                    ),
                   ),
                 ],
               ],
@@ -358,25 +442,39 @@ class _OrderCard extends StatelessWidget {
 
   Color _statusColor(OrderStatus s) {
     switch (s) {
-      case OrderStatus.pending: return Colors.grey;
-      case OrderStatus.confirmed: return Colors.orange;
-      case OrderStatus.paid: return Colors.blue;
-      case OrderStatus.delivered: return Colors.teal;
-      case OrderStatus.completed: return Colors.green;
-      case OrderStatus.cancelled: return Colors.red;
-      case OrderStatus.refunded: return Colors.purple;
+      case OrderStatus.pending:
+        return Colors.grey;
+      case OrderStatus.confirmed:
+        return Colors.orange;
+      case OrderStatus.paid:
+        return Colors.blue;
+      case OrderStatus.delivered:
+        return Colors.teal;
+      case OrderStatus.completed:
+        return Colors.green;
+      case OrderStatus.cancelled:
+        return Colors.red;
+      case OrderStatus.refunded:
+        return Colors.purple;
     }
   }
 
   AppStatusTone _statusTone(OrderStatus s) {
     switch (s) {
-      case OrderStatus.pending: return AppStatusTone.neutral;
-      case OrderStatus.confirmed: return AppStatusTone.warning;
-      case OrderStatus.paid: return AppStatusTone.success;
-      case OrderStatus.delivered: return AppStatusTone.success;
-      case OrderStatus.completed: return AppStatusTone.success;
-      case OrderStatus.cancelled: return AppStatusTone.danger;
-      case OrderStatus.refunded: return AppStatusTone.danger;
+      case OrderStatus.pending:
+        return AppStatusTone.neutral;
+      case OrderStatus.confirmed:
+        return AppStatusTone.warning;
+      case OrderStatus.paid:
+        return AppStatusTone.success;
+      case OrderStatus.delivered:
+        return AppStatusTone.success;
+      case OrderStatus.completed:
+        return AppStatusTone.success;
+      case OrderStatus.cancelled:
+        return AppStatusTone.danger;
+      case OrderStatus.refunded:
+        return AppStatusTone.danger;
     }
   }
 }

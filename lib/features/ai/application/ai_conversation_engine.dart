@@ -79,7 +79,12 @@ class AiConversationEngine {
 
     switch (_settings.provider) {
       case AiProviderType.mock:
-        return _mockReply(customerName, conversationHistory, negotiation, businessProfile);
+        return _mockReply(
+          customerName,
+          conversationHistory,
+          negotiation,
+          businessProfile,
+        );
       case AiProviderType.openaiCompatible:
         return _openAiReply(messages, negotiation);
     }
@@ -182,7 +187,9 @@ class AiConversationEngine {
         buf.writeln('- 已达共识: ${negotiation.agreedTerms.join("、")}');
       }
       if (negotiation.concessionCount > 0) {
-        buf.writeln('- 已让步${negotiation.concessionCount}次(上限${negotiation.maxConcessions}次)');
+        buf.writeln(
+          '- 已让步${negotiation.concessionCount}次(上限${negotiation.maxConcessions}次)',
+        );
       }
     }
 
@@ -192,7 +199,9 @@ class AiConversationEngine {
         buf.writeln('- ⚡ 检测到购买信号: ${latestSentiment.buyingSignals.join("、")}');
       }
       if (latestSentiment.hasObjection) {
-        buf.writeln('- ⚠️ 客户异议: ${latestSentiment.objectionPatterns.join("、")}');
+        buf.writeln(
+          '- ⚠️ 客户异议: ${latestSentiment.objectionPatterns.join("、")}',
+        );
       }
     }
 
@@ -266,8 +275,10 @@ class AiConversationEngine {
     final apiBase = _settings.apiBase;
     final apiKey = _settings.apiKey;
 
-    if (apiBase == null || apiBase.trim().isEmpty ||
-        apiKey == null || apiKey.trim().isEmpty) {
+    if (apiBase == null ||
+        apiBase.trim().isEmpty ||
+        apiKey == null ||
+        apiKey.trim().isEmpty) {
       return _fallbackMockReply('openai-compatible(no-config)');
     }
 
@@ -284,8 +295,7 @@ class AiConversationEngine {
       'model': _settings.model,
       'temperature': _settings.temperature,
       'messages': messages,
-      if (isGpt5) 'max_completion_tokens': 500
-      else 'max_tokens': 300,
+      if (isGpt5) 'max_completion_tokens': 500 else 'max_tokens': 300,
     };
 
     try {
@@ -299,15 +309,22 @@ class AiConversationEngine {
       request.headers.set('Content-Type', 'application/json; charset=utf-8');
       request.add(utf8.encode(jsonBody));
 
-      final response = await request.close().timeout(const Duration(seconds: 60));
+      final response = await request.close().timeout(
+        const Duration(seconds: 60),
+      );
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
         ioClient.close();
-        return _fallbackMockReply('openai-compatible(http-${response.statusCode})');
+        return _fallbackMockReply(
+          'openai-compatible(http-${response.statusCode})',
+        );
       }
 
       // 收集所有字节后UTF-8解码
-      final bytes = await response.fold<List<int>>([], (prev, chunk) => prev..addAll(chunk));
+      final bytes = await response.fold<List<int>>(
+        [],
+        (prev, chunk) => prev..addAll(chunk),
+      );
       ioClient.close();
 
       final responseText = utf8.decode(bytes);
@@ -322,7 +339,9 @@ class AiConversationEngine {
         confidence: 0.85,
         provider: 'openai-compatible',
         model: _settings.model,
-        strategy: negotiation != null ? _negotiationStageLabel(negotiation.stage) : 'general',
+        strategy: negotiation != null
+            ? _negotiationStageLabel(negotiation.stage)
+            : 'general',
         reasoning: null,
       );
     } catch (e) {
@@ -363,9 +382,7 @@ class AiConversationEngine {
     BusinessProfile? businessProfile,
   ) async {
     final isTrading = businessProfile?.businessType == BusinessType.trading;
-    final latestCustomer = history
-        .where((m) => m.role == 'customer')
-        .toList();
+    final latestCustomer = history.where((m) => m.role == 'customer').toList();
     final latestText = latestCustomer.isEmpty
         ? ''
         : latestCustomer.last.content;
@@ -376,12 +393,13 @@ class AiConversationEngine {
 
     // ===== 交易模式 =====
     if (isTrading) {
-      if (negotiation == null || negotiation.stage == NegotiationStage.opening) {
+      if (negotiation == null ||
+          negotiation.stage == NegotiationStage.opening) {
         reply = '在的，看看要什么';
         strategy = '开场';
         confidence = 0.90;
       } else if (negotiation.stage == NegotiationStage.exploring ||
-                 negotiation.stage == NegotiationStage.proposing) {
+          negotiation.stage == NegotiationStage.proposing) {
         if (negotiation.ourOfferPrice != null) {
           reply = '这个${negotiation.ourOfferPrice!.toStringAsFixed(0)}，性价比很高的';
           strategy = '报价';

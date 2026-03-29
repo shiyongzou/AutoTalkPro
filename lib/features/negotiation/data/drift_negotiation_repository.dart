@@ -12,11 +12,13 @@ class DriftNegotiationRepository implements NegotiationRepository {
 
   @override
   Future<NegotiationContext?> getByConversation(String conversationId) async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM negotiation_contexts WHERE conversation_id = ? ORDER BY updated_at DESC LIMIT 1',
-      variables: [Variable(conversationId)],
-      readsFrom: {},
-    ).get();
+    final rows = await _db
+        .customSelect(
+          'SELECT * FROM negotiation_contexts WHERE conversation_id = ? ORDER BY updated_at DESC LIMIT 1',
+          variables: [Variable(conversationId)],
+          readsFrom: {},
+        )
+        .get();
     if (rows.isEmpty) return null;
     return _fromRow(rows.first);
   }
@@ -31,12 +33,20 @@ class DriftNegotiationRepository implements NegotiationRepository {
         key_objections_json,agreed_terms_json,created_at,updated_at
       ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
       [
-        ctx.id, ctx.conversationId, ctx.customerId,
-        ctx.stage.name, jsonEncode(ctx.productIds),
-        ctx.customerBudgetLow, ctx.customerBudgetHigh,
-        ctx.ourOfferPrice, ctx.customerOfferPrice,
-        ctx.concessionCount, ctx.maxConcessions, ctx.dealScore,
-        jsonEncode(ctx.keyObjections), jsonEncode(ctx.agreedTerms),
+        ctx.id,
+        ctx.conversationId,
+        ctx.customerId,
+        ctx.stage.name,
+        jsonEncode(ctx.productIds),
+        ctx.customerBudgetLow,
+        ctx.customerBudgetHigh,
+        ctx.ourOfferPrice,
+        ctx.customerOfferPrice,
+        ctx.concessionCount,
+        ctx.maxConcessions,
+        ctx.dealScore,
+        jsonEncode(ctx.keyObjections),
+        jsonEncode(ctx.agreedTerms),
         ctx.createdAt.millisecondsSinceEpoch,
         ctx.updatedAt.millisecondsSinceEpoch,
       ],
@@ -45,10 +55,12 @@ class DriftNegotiationRepository implements NegotiationRepository {
 
   @override
   Future<List<NegotiationContext>> listActive() async {
-    final rows = await _db.customSelect(
-      "SELECT * FROM negotiation_contexts WHERE stage NOT IN ('won','lost') ORDER BY updated_at DESC",
-      readsFrom: {},
-    ).get();
+    final rows = await _db
+        .customSelect(
+          "SELECT * FROM negotiation_contexts WHERE stage NOT IN ('won','lost') ORDER BY updated_at DESC",
+          readsFrom: {},
+        )
+        .get();
     return rows.map(_fromRow).toList();
   }
 
@@ -61,7 +73,8 @@ class DriftNegotiationRepository implements NegotiationRepository {
         (s) => s.name == row.read<String>('stage'),
         orElse: () => NegotiationStage.opening,
       ),
-      productIds: (jsonDecode(row.read<String>('product_ids_json')) as List).cast<String>(),
+      productIds: (jsonDecode(row.read<String>('product_ids_json')) as List)
+          .cast<String>(),
       customerBudgetLow: row.readNullable<double>('customer_budget_low'),
       customerBudgetHigh: row.readNullable<double>('customer_budget_high'),
       ourOfferPrice: row.readNullable<double>('our_offer_price'),
@@ -69,10 +82,17 @@ class DriftNegotiationRepository implements NegotiationRepository {
       concessionCount: row.read<int>('concession_count'),
       maxConcessions: row.read<int>('max_concessions'),
       dealScore: row.read<double>('deal_score'),
-      keyObjections: (jsonDecode(row.read<String>('key_objections_json')) as List).cast<String>(),
-      agreedTerms: (jsonDecode(row.read<String>('agreed_terms_json')) as List).cast<String>(),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(row.read<int>('created_at')),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.read<int>('updated_at')),
+      keyObjections:
+          (jsonDecode(row.read<String>('key_objections_json')) as List)
+              .cast<String>(),
+      agreedTerms: (jsonDecode(row.read<String>('agreed_terms_json')) as List)
+          .cast<String>(),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(
+        row.read<int>('created_at'),
+      ),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(
+        row.read<int>('updated_at'),
+      ),
     );
   }
 }

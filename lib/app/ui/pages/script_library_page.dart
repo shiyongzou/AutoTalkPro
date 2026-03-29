@@ -28,7 +28,9 @@ class _ScriptLibraryPageState extends State<ScriptLibraryPage> {
   Future<void> _load() async {
     final rows = filterCategory == null
         ? await widget.appContext.scriptRepository.listAll()
-        : await widget.appContext.scriptRepository.listByCategory(filterCategory!);
+        : await widget.appContext.scriptRepository.listByCategory(
+            filterCategory!,
+          );
     if (!mounted) return;
     setState(() => scripts = rows);
   }
@@ -37,7 +39,8 @@ class _ScriptLibraryPageState extends State<ScriptLibraryPage> {
     final titleCtl = TextEditingController(text: existing?.title ?? '');
     final contentCtl = TextEditingController(text: existing?.content ?? '');
     final tagsCtl = TextEditingController(text: existing?.tags.join('、') ?? '');
-    SalesScriptCategory category = existing?.category ?? SalesScriptCategory.custom;
+    SalesScriptCategory category =
+        existing?.category ?? SalesScriptCategory.custom;
 
     final result = await showDialog<bool>(
       context: context,
@@ -54,7 +57,10 @@ class _ScriptLibraryPageState extends State<ScriptLibraryPage> {
                     Expanded(
                       child: TextField(
                         controller: titleCtl,
-                        decoration: const InputDecoration(labelText: '标题 *', border: OutlineInputBorder()),
+                        decoration: const InputDecoration(
+                          labelText: '标题 *',
+                          border: OutlineInputBorder(),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -62,12 +68,24 @@ class _ScriptLibraryPageState extends State<ScriptLibraryPage> {
                       width: 150,
                       child: DropdownButtonFormField<SalesScriptCategory>(
                         initialValue: category,
-                        decoration: const InputDecoration(labelText: '分类', border: OutlineInputBorder()),
-                        items: SalesScriptCategory.values.map((c) => DropdownMenuItem(
-                          value: c,
-                          child: Text(_categoryLabel(c), style: const TextStyle(fontSize: 13)),
-                        )).toList(),
-                        onChanged: (v) { if (v != null) setFormState(() => category = v); },
+                        decoration: const InputDecoration(
+                          labelText: '分类',
+                          border: OutlineInputBorder(),
+                        ),
+                        items: SalesScriptCategory.values
+                            .map(
+                              (c) => DropdownMenuItem(
+                                value: c,
+                                child: Text(
+                                  _categoryLabel(c),
+                                  style: const TextStyle(fontSize: 13),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (v) {
+                          if (v != null) setFormState(() => category = v);
+                        },
                       ),
                     ),
                   ],
@@ -85,19 +103,26 @@ class _ScriptLibraryPageState extends State<ScriptLibraryPage> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: tagsCtl,
-                  decoration: const InputDecoration(labelText: '标签(顿号分隔)', border: OutlineInputBorder()),
+                  decoration: const InputDecoration(
+                    labelText: '标签(顿号分隔)',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
               ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('取消')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('取消'),
+            ),
             FilledButton(
               onPressed: () {
-                if (titleCtl.text.trim().isEmpty || contentCtl.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(
-                    const SnackBar(content: Text('标题和内容不能为空')),
-                  );
+                if (titleCtl.text.trim().isEmpty ||
+                    contentCtl.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(
+                    ctx,
+                  ).showSnackBar(const SnackBar(content: Text('标题和内容不能为空')));
                   return;
                 }
                 Navigator.pop(ctx, true);
@@ -112,7 +137,12 @@ class _ScriptLibraryPageState extends State<ScriptLibraryPage> {
     if (result != true) return;
 
     final now = DateTime.now();
-    final tags = tagsCtl.text.trim().split(RegExp(r'[、,，]')).where((s) => s.trim().isNotEmpty).map((s) => s.trim()).toList();
+    final tags = tagsCtl.text
+        .trim()
+        .split(RegExp(r'[、,，]'))
+        .where((s) => s.trim().isNotEmpty)
+        .map((s) => s.trim())
+        .toList();
     final script = ScriptTemplate(
       id: existing?.id ?? 'script_${now.microsecondsSinceEpoch}',
       category: category,
@@ -135,7 +165,10 @@ class _ScriptLibraryPageState extends State<ScriptLibraryPage> {
         title: const Text('确认删除'),
         content: Text('确定要删除话术"${script.title}"吗？'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('取消')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('取消'),
+          ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -153,7 +186,10 @@ class _ScriptLibraryPageState extends State<ScriptLibraryPage> {
     Clipboard.setData(ClipboardData(text: script.content));
     widget.appContext.scriptRepository.incrementUseCount(script.id);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('已复制: ${script.title}'), duration: const Duration(seconds: 1)),
+      SnackBar(
+        content: Text('已复制: ${script.title}'),
+        duration: const Duration(seconds: 1),
+      ),
     );
   }
 
@@ -173,7 +209,10 @@ class _ScriptLibraryPageState extends State<ScriptLibraryPage> {
             spacing: tokens.spaceSm,
             runSpacing: tokens.spaceSm,
             children: [
-              SizedBox(width: 120, child: AppMetricTile(label: '总话术', value: '${scripts.length}')),
+              SizedBox(
+                width: 120,
+                child: AppMetricTile(label: '总话术', value: '${scripts.length}'),
+              ),
             ],
           ),
           SizedBox(height: tokens.spaceSm),
@@ -184,19 +223,30 @@ class _ScriptLibraryPageState extends State<ScriptLibraryPage> {
                 FilterChip(
                   label: const Text('全部', style: TextStyle(fontSize: 11)),
                   selected: filterCategory == null,
-                  onSelected: (_) { setState(() => filterCategory = null); _load(); },
+                  onSelected: (_) {
+                    setState(() => filterCategory = null);
+                    _load();
+                  },
                   visualDensity: VisualDensity.compact,
                 ),
                 const SizedBox(width: 4),
-                ...SalesScriptCategory.values.map((c) => Padding(
-                  padding: const EdgeInsets.only(right: 4),
-                  child: FilterChip(
-                    label: Text(_categoryLabel(c), style: const TextStyle(fontSize: 11)),
-                    selected: filterCategory == c,
-                    onSelected: (_) { setState(() => filterCategory = c); _load(); },
-                    visualDensity: VisualDensity.compact,
+                ...SalesScriptCategory.values.map(
+                  (c) => Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: FilterChip(
+                      label: Text(
+                        _categoryLabel(c),
+                        style: const TextStyle(fontSize: 11),
+                      ),
+                      selected: filterCategory == c,
+                      onSelected: (_) {
+                        setState(() => filterCategory = c);
+                        _load();
+                      },
+                      visualDensity: VisualDensity.compact,
+                    ),
                   ),
-                )),
+                ),
                 const SizedBox(width: 8),
                 Tooltip(
                   message: '新增一条常用话术',
@@ -229,12 +279,24 @@ class _ScriptLibraryPageState extends State<ScriptLibraryPage> {
                           ),
                           title: Row(
                             children: [
-                              Text(s.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                              Text(
+                                s.title,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                               const SizedBox(width: 8),
                               AppStatusTag(label: s.categoryLabel),
                               if (s.useCount > 0) ...[
                                 const SizedBox(width: 8),
-                                Text('使用${s.useCount}次', style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                                Text(
+                                  '使用${s.useCount}次',
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey,
+                                  ),
+                                ),
                               ],
                             ],
                           ),
@@ -257,7 +319,11 @@ class _ScriptLibraryPageState extends State<ScriptLibraryPage> {
                               Tooltip(
                                 message: '删除此话术',
                                 child: IconButton(
-                                  icon: Icon(Icons.delete_outline, size: 16, color: Colors.red.shade300),
+                                  icon: Icon(
+                                    Icons.delete_outline,
+                                    size: 16,
+                                    color: Colors.red.shade300,
+                                  ),
                                   onPressed: () => _delete(s),
                                 ),
                               ),
@@ -276,13 +342,20 @@ class _ScriptLibraryPageState extends State<ScriptLibraryPage> {
 
   String _categoryLabel(SalesScriptCategory c) {
     switch (c) {
-      case SalesScriptCategory.greeting: return '开场白';
-      case SalesScriptCategory.quote: return '报价';
-      case SalesScriptCategory.objection: return '异议处理';
-      case SalesScriptCategory.closing: return '成交';
-      case SalesScriptCategory.followUp: return '跟进';
-      case SalesScriptCategory.afterSales: return '售后';
-      case SalesScriptCategory.custom: return '自定义';
+      case SalesScriptCategory.greeting:
+        return '开场白';
+      case SalesScriptCategory.quote:
+        return '报价';
+      case SalesScriptCategory.objection:
+        return '异议处理';
+      case SalesScriptCategory.closing:
+        return '成交';
+      case SalesScriptCategory.followUp:
+        return '跟进';
+      case SalesScriptCategory.afterSales:
+        return '售后';
+      case SalesScriptCategory.custom:
+        return '自定义';
     }
   }
 }

@@ -17,9 +17,15 @@ class DriftEscalationRepository implements EscalationRepository {
         created_at,updated_at
       ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)''',
       [
-        alert.id, alert.conversationId, alert.customerId,
-        alert.reason.name, alert.priority.name, alert.status.name,
-        alert.title, alert.detail, alert.suggestedAction,
+        alert.id,
+        alert.conversationId,
+        alert.customerId,
+        alert.reason.name,
+        alert.priority.name,
+        alert.status.name,
+        alert.title,
+        alert.detail,
+        alert.suggestedAction,
         alert.resolvedBy,
         alert.resolvedAt?.millisecondsSinceEpoch,
         alert.createdAt.millisecondsSinceEpoch,
@@ -46,41 +52,51 @@ class DriftEscalationRepository implements EscalationRepository {
 
   @override
   Future<List<EscalationAlert>> listPending() async {
-    final rows = await _db.customSelect(
-      "SELECT * FROM escalation_alerts WHERE status = 'pending' ORDER BY "
-      "CASE priority WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, "
-      'created_at ASC',
-      readsFrom: {},
-    ).get();
+    final rows = await _db
+        .customSelect(
+          "SELECT * FROM escalation_alerts WHERE status = 'pending' ORDER BY "
+          "CASE priority WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, "
+          'created_at ASC',
+          readsFrom: {},
+        )
+        .get();
     return rows.map(_fromRow).toList();
   }
 
   @override
-  Future<List<EscalationAlert>> listByConversation(String conversationId) async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM escalation_alerts WHERE conversation_id = ? ORDER BY created_at DESC',
-      variables: [Variable(conversationId)],
-      readsFrom: {},
-    ).get();
+  Future<List<EscalationAlert>> listByConversation(
+    String conversationId,
+  ) async {
+    final rows = await _db
+        .customSelect(
+          'SELECT * FROM escalation_alerts WHERE conversation_id = ? ORDER BY created_at DESC',
+          variables: [Variable(conversationId)],
+          readsFrom: {},
+        )
+        .get();
     return rows.map(_fromRow).toList();
   }
 
   @override
   Future<int> pendingCount() async {
-    final row = await _db.customSelect(
-      "SELECT COUNT(1) c FROM escalation_alerts WHERE status = 'pending'",
-      readsFrom: {},
-    ).getSingle();
+    final row = await _db
+        .customSelect(
+          "SELECT COUNT(1) c FROM escalation_alerts WHERE status = 'pending'",
+          readsFrom: {},
+        )
+        .getSingle();
     return row.read<int>('c');
   }
 
   @override
   Future<List<EscalationAlert>> listAll({int limit = 50}) async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM escalation_alerts ORDER BY created_at DESC LIMIT ?',
-      variables: [Variable(limit)],
-      readsFrom: {},
-    ).get();
+    final rows = await _db
+        .customSelect(
+          'SELECT * FROM escalation_alerts ORDER BY created_at DESC LIMIT ?',
+          variables: [Variable(limit)],
+          readsFrom: {},
+        )
+        .get();
     return rows.map(_fromRow).toList();
   }
 
@@ -109,8 +125,12 @@ class DriftEscalationRepository implements EscalationRepository {
       resolvedAt: resolvedAtMs == null
           ? null
           : DateTime.fromMillisecondsSinceEpoch(resolvedAtMs),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(row.read<int>('created_at')),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.read<int>('updated_at')),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(
+        row.read<int>('created_at'),
+      ),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(
+        row.read<int>('updated_at'),
+      ),
     );
   }
 }

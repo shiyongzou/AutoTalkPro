@@ -43,9 +43,15 @@ class _LockScreenState extends State<LockScreen> {
             children: [
               Icon(Icons.lock_outline, size: 56, color: scheme.primary),
               const SizedBox(height: 16),
-              Text('AutoTalk Pro', style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                'AutoTalk Pro',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: 6),
-              Text('应用已锁定，请输入密码', style: TextStyle(color: scheme.onSurfaceVariant)),
+              Text(
+                '应用已锁定，请输入密码',
+                style: TextStyle(color: scheme.onSurfaceVariant),
+              ),
               const SizedBox(height: 24),
               TextField(
                 controller: _controller,

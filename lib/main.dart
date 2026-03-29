@@ -148,7 +148,9 @@ class _TgAiSalesAppState extends State<TgAiSalesApp> {
         msg,
       ) async {
         // ignore: avoid_print
-        print('[BOOT] 微信消息流收到: type=${msg.type} isPrivate=${msg.isPrivate} isMentioned=${msg.isMentioned} fromId=${msg.fromId} content=${msg.content.length > 30 ? msg.content.substring(0, 30) : msg.content}');
+        print(
+          '[BOOT] 微信消息流收到: type=${msg.type} isPrivate=${msg.isPrivate} isMentioned=${msg.isMentioned} fromId=${msg.fromId} content=${msg.content.length > 30 ? msg.content.substring(0, 30) : msg.content}',
+        );
         await SupportLogger.log(
           'wechat.main',
           'incoming_received',
@@ -169,7 +171,9 @@ class _TgAiSalesAppState extends State<TgAiSalesApp> {
         final contentMentioned = !msg.isPrivate && msg.content.contains('@');
         final effectiveMentioned = msg.isMentioned || contentMentioned;
         // ignore: avoid_print
-        print('[BOOT] 微信消息过滤: isText=${msg.isText} isPrivate=${msg.isPrivate} isMentioned=${msg.isMentioned} contentMentioned=$contentMentioned → ${msg.isText && (msg.isPrivate || effectiveMentioned) ? "转发" : "跳过"}');
+        print(
+          '[BOOT] 微信消息过滤: isText=${msg.isText} isPrivate=${msg.isPrivate} isMentioned=${msg.isMentioned} contentMentioned=$contentMentioned → ${msg.isText && (msg.isPrivate || effectiveMentioned) ? "转发" : "跳过"}',
+        );
         if (msg.isText && (msg.isPrivate || effectiveMentioned)) {
           // 群消息用群名（发送时webhook按群名查找），私聊用昵称
           final isGroup = !msg.isPrivate && msg.roomId != null;
@@ -177,7 +181,9 @@ class _TgAiSalesAppState extends State<TgAiSalesApp> {
               ? msg.roomName!
               : '未知群';
           // ignore: avoid_print
-          print('[BOOT] 群信息: isGroup=$isGroup roomName=${msg.roomName} roomId=${msg.roomId}');
+          print(
+            '[BOOT] 群信息: isGroup=$isGroup roomName=${msg.roomName} roomId=${msg.roomId}',
+          );
           // peerId: 私聊=昵称，群聊=room:群名（adapter用于发送）
           // customerId: 私聊=昵称，群聊=群名:发送者（按人分会话，多轮不串）
           final groupPeerId = 'room:$groupName';
@@ -185,9 +191,7 @@ class _TgAiSalesAppState extends State<TgAiSalesApp> {
           final raw = IncomingRawMessage(
             channel: ChannelType.wechat,
             peerId: isGroup ? groupPeerId : msg.fromId,
-            peerName: isGroup
-                ? '[群$groupName] ${msg.fromName}'
-                : msg.fromName,
+            peerName: isGroup ? '[群$groupName] ${msg.fromName}' : msg.fromName,
             text: isGroup ? '${msg.fromName}: ${msg.content}' : msg.content,
             customerId: isGroup ? groupCustomerId : null,
             receivedAt: DateTime.now(),

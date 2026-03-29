@@ -78,7 +78,10 @@ class NegotiationEngine {
     }
 
     if (newObjections.isNotEmpty) {
-      final allObjections = {...updated.keyObjections, ...newObjections}.toList();
+      final allObjections = {
+        ...updated.keyObjections,
+        ...newObjections,
+      }.toList();
       updated = updated.copyWith(keyObjections: allObjections);
     }
 
@@ -116,7 +119,9 @@ class NegotiationEngine {
         customerBudget: updated.customerBudgetHigh,
       );
 
-      if (quote != null && updated.stage == NegotiationStage.countering && updated.canConcede) {
+      if (quote != null &&
+          updated.stage == NegotiationStage.countering &&
+          updated.canConcede) {
         quote = await pricingEngine.computeConcession(
           productId: updated.productIds.first,
           quantity: 1,
@@ -142,7 +147,8 @@ class NegotiationEngine {
     } else if (quote != null && quote.requiresApproval) {
       shouldEscalate = true;
       escalateReason = '当前折扣力度需要${quote.approvalLevel}级审批';
-    } else if (!updated.canConcede && updated.stage == NegotiationStage.countering) {
+    } else if (!updated.canConcede &&
+        updated.stage == NegotiationStage.countering) {
       shouldEscalate = true;
       escalateReason = '让步次数已达上限(${updated.maxConcessions}次)，需人工接管';
     } else if (updated.keyObjections.length >= 3) {
@@ -197,8 +203,10 @@ class NegotiationEngine {
 
     switch (ctx.stage) {
       case NegotiationStage.opening:
-        if (text.contains('价格') || text.contains('报价') ||
-            text.contains('多少钱') || text.contains('费用')) {
+        if (text.contains('价格') ||
+            text.contains('报价') ||
+            text.contains('多少钱') ||
+            text.contains('费用')) {
           return ctx.copyWith(stage: NegotiationStage.exploring);
         }
         if (text.contains('需求') || text.contains('想要') || text.contains('了解')) {
@@ -207,14 +215,18 @@ class NegotiationEngine {
         return ctx;
 
       case NegotiationStage.exploring:
-        if (text.contains('方案') || text.contains('套餐') || text.contains('报个价')) {
+        if (text.contains('方案') ||
+            text.contains('套餐') ||
+            text.contains('报个价')) {
           return ctx.copyWith(stage: NegotiationStage.proposing);
         }
         return ctx;
 
       case NegotiationStage.proposing:
-        if (text.contains('太贵') || text.contains('优惠') ||
-            text.contains('便宜') || text.contains('让步')) {
+        if (text.contains('太贵') ||
+            text.contains('优惠') ||
+            text.contains('便宜') ||
+            text.contains('让步')) {
           return ctx.copyWith(stage: NegotiationStage.countering);
         }
         if (text.contains('可以') || text.contains('行') || text.contains('合同')) {
@@ -223,18 +235,24 @@ class NegotiationEngine {
         return ctx;
 
       case NegotiationStage.countering:
-        if (text.contains('行') || text.contains('就这个') ||
-            text.contains('成交') || text.contains('签')) {
+        if (text.contains('行') ||
+            text.contains('就这个') ||
+            text.contains('成交') ||
+            text.contains('签')) {
           return ctx.copyWith(stage: NegotiationStage.closing);
         }
-        if (text.contains('不行') || text.contains('算了') || text.contains('不要了')) {
+        if (text.contains('不行') ||
+            text.contains('算了') ||
+            text.contains('不要了')) {
           return ctx.copyWith(stage: NegotiationStage.stalled);
         }
         return ctx;
 
       case NegotiationStage.closing:
-        if (text.contains('付款') || text.contains('打款') ||
-            text.contains('转账') || text.contains('签了')) {
+        if (text.contains('付款') ||
+            text.contains('打款') ||
+            text.contains('转账') ||
+            text.contains('签了')) {
           return ctx.copyWith(stage: NegotiationStage.won);
         }
         if (text.contains('不签') || text.contains('取消')) {
@@ -243,7 +261,9 @@ class NegotiationEngine {
         return ctx;
 
       case NegotiationStage.stalled:
-        if (text.contains('重新') || text.contains('再看看') || text.contains('还是想')) {
+        if (text.contains('重新') ||
+            text.contains('再看看') ||
+            text.contains('还是想')) {
           return ctx.copyWith(stage: NegotiationStage.countering);
         }
         return ctx;
@@ -325,13 +345,17 @@ class NegotiationEngine {
   ) {
     final buf = StringBuffer();
     buf.writeln('[谈判策略: $strategy]');
-    buf.writeln('[阶段: ${_stageLabel(ctx.stage)} | 成交分: ${(ctx.dealScore * 100).toInt()}%]');
+    buf.writeln(
+      '[阶段: ${_stageLabel(ctx.stage)} | 成交分: ${(ctx.dealScore * 100).toInt()}%]',
+    );
     if (ctx.keyObjections.isNotEmpty) {
       buf.writeln('[待处理异议: ${ctx.keyObjections.join('、')}]');
     }
     if (quote != null) {
-      buf.writeln('[报价: ¥${quote.quotedPrice.toStringAsFixed(0)} '
-          '(折${quote.discountPercent.toStringAsFixed(1)}%)]');
+      buf.writeln(
+        '[报价: ¥${quote.quotedPrice.toStringAsFixed(0)} '
+        '(折${quote.discountPercent.toStringAsFixed(1)}%)]',
+      );
     }
     return buf.toString();
   }

@@ -19,8 +19,11 @@ class DriftSentimentRepository implements SentimentRepository {
         emotion_tags_json,created_at
       ) VALUES (?,?,?,?,?,?,?,?,?,?)''',
       [
-        record.id, record.conversationId, record.messageId,
-        record.sentiment.name, record.confidence,
+        record.id,
+        record.conversationId,
+        record.messageId,
+        record.sentiment.name,
+        record.confidence,
         jsonEncode(record.buyingSignals),
         jsonEncode(record.hesitationSignals),
         jsonEncode(record.objectionPatterns),
@@ -31,22 +34,28 @@ class DriftSentimentRepository implements SentimentRepository {
   }
 
   @override
-  Future<List<SentimentRecord>> listByConversation(String conversationId) async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM sentiment_records WHERE conversation_id = ? ORDER BY created_at DESC',
-      variables: [Variable(conversationId)],
-      readsFrom: {},
-    ).get();
+  Future<List<SentimentRecord>> listByConversation(
+    String conversationId,
+  ) async {
+    final rows = await _db
+        .customSelect(
+          'SELECT * FROM sentiment_records WHERE conversation_id = ? ORDER BY created_at DESC',
+          variables: [Variable(conversationId)],
+          readsFrom: {},
+        )
+        .get();
     return rows.map(_fromRow).toList();
   }
 
   @override
   Future<SentimentRecord?> getLatest(String conversationId) async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM sentiment_records WHERE conversation_id = ? ORDER BY created_at DESC LIMIT 1',
-      variables: [Variable(conversationId)],
-      readsFrom: {},
-    ).get();
+    final rows = await _db
+        .customSelect(
+          'SELECT * FROM sentiment_records WHERE conversation_id = ? ORDER BY created_at DESC LIMIT 1',
+          variables: [Variable(conversationId)],
+          readsFrom: {},
+        )
+        .get();
     if (rows.isEmpty) return null;
     return _fromRow(rows.first);
   }
@@ -61,11 +70,20 @@ class DriftSentimentRepository implements SentimentRepository {
         orElse: () => SentimentType.neutral,
       ),
       confidence: row.read<double>('confidence'),
-      buyingSignals: (jsonDecode(row.read<String>('buying_signals_json')) as List).cast<String>(),
-      hesitationSignals: (jsonDecode(row.read<String>('hesitation_signals_json')) as List).cast<String>(),
-      objectionPatterns: (jsonDecode(row.read<String>('objection_patterns_json')) as List).cast<String>(),
-      emotionTags: (jsonDecode(row.read<String>('emotion_tags_json')) as List).cast<String>(),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(row.read<int>('created_at')),
+      buyingSignals:
+          (jsonDecode(row.read<String>('buying_signals_json')) as List)
+              .cast<String>(),
+      hesitationSignals:
+          (jsonDecode(row.read<String>('hesitation_signals_json')) as List)
+              .cast<String>(),
+      objectionPatterns:
+          (jsonDecode(row.read<String>('objection_patterns_json')) as List)
+              .cast<String>(),
+      emotionTags: (jsonDecode(row.read<String>('emotion_tags_json')) as List)
+          .cast<String>(),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(
+        row.read<int>('created_at'),
+      ),
     );
   }
 }

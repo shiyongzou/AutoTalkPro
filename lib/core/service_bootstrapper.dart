@@ -16,12 +16,20 @@ class ServiceBootstrapper {
   /// 缓存根目录
   static String get _cacheRoot {
     if (Platform.isMacOS) {
-      final home = Platform.environment['HOME'] ??
+      final home =
+          Platform.environment['HOME'] ??
           Platform.environment['USERPROFILE'] ??
           Directory.current.path;
-      return p.join(home, 'Library', 'Application Support', 'AutoTalk Pro', 'services');
+      return p.join(
+        home,
+        'Library',
+        'Application Support',
+        'AutoTalk Pro',
+        'services',
+      );
     } else if (Platform.isWindows) {
-      final appData = Platform.environment['APPDATA'] ??
+      final appData =
+          Platform.environment['APPDATA'] ??
           Platform.environment['USERPROFILE'] ??
           r'C:\Users\Public';
       return p.join(appData, 'AutoTalk Pro', 'services');
@@ -63,8 +71,12 @@ class ServiceBootstrapper {
       p.join(_cacheRoot, serviceName);
 
   /// wechat_service入口
-  static String get wechatEntryPath =>
-      p.join(serviceDir('wechat_service'), 'node_modules', 'wechatbot-webhook', 'index.js');
+  static String get wechatEntryPath => p.join(
+    serviceDir('wechat_service'),
+    'node_modules',
+    'wechatbot-webhook',
+    'index.js',
+  );
 
   /// telegram_service入口
   static String get telegramEntryPath =>
@@ -168,26 +180,33 @@ class ServiceBootstrapper {
     bool isZip;
 
     if (Platform.isMacOS) {
-      url = 'https://nodejs.org/dist/$_nodeVersion/node-$_nodeVersion-darwin-$arch.tar.gz';
+      url =
+          'https://nodejs.org/dist/$_nodeVersion/node-$_nodeVersion-darwin-$arch.tar.gz';
       isZip = false;
     } else if (Platform.isWindows) {
-      url = 'https://nodejs.org/dist/$_nodeVersion/node-$_nodeVersion-win-x64.zip';
+      url =
+          'https://nodejs.org/dist/$_nodeVersion/node-$_nodeVersion-win-x64.zip';
       isZip = true;
     } else {
-      url = 'https://nodejs.org/dist/$_nodeVersion/node-$_nodeVersion-linux-$arch.tar.gz';
+      url =
+          'https://nodejs.org/dist/$_nodeVersion/node-$_nodeVersion-linux-$arch.tar.gz';
       isZip = false;
     }
 
-    final tmpFile = File(p.join(_cacheRoot, isZip ? 'node_dl.zip' : 'node_dl.tar.gz'));
+    final tmpFile = File(
+      p.join(_cacheRoot, isZip ? 'node_dl.zip' : 'node_dl.tar.gz'),
+    );
 
     try {
       // 下载
       onProgress?.call('正在下载 Node.js...');
-      final dlResult = await Process.run(
-        'curl',
-        ['-fSL', '--progress-bar', '-o', tmpFile.path, url],
-        environment: Platform.environment,
-      );
+      final dlResult = await Process.run('curl', [
+        '-fSL',
+        '--progress-bar',
+        '-o',
+        tmpFile.path,
+        url,
+      ], environment: Platform.environment);
       if (dlResult.exitCode != 0) {
         return (ok: false, message: 'Node.js下载失败，请检查网络连接');
       }
@@ -199,10 +218,12 @@ class ServiceBootstrapper {
       tmpExtract.createSync();
 
       if (!isZip) {
-        final result = await Process.run(
-          'tar',
-          ['-xzf', tmpFile.path, '-C', tmpExtract.path],
-        );
+        final result = await Process.run('tar', [
+          '-xzf',
+          tmpFile.path,
+          '-C',
+          tmpExtract.path,
+        ]);
         if (result.exitCode != 0) {
           return (ok: false, message: 'Node.js解压失败: ${result.stderr}');
         }
@@ -237,7 +258,9 @@ class ServiceBootstrapper {
       // 清理临时文件
       if (tmpFile.existsSync()) tmpFile.deleteSync();
       if (tmpExtract.existsSync()) {
-        try { tmpExtract.deleteSync(recursive: true); } catch (_) {}
+        try {
+          tmpExtract.deleteSync(recursive: true);
+        } catch (_) {}
       }
 
       // 验证
@@ -263,7 +286,9 @@ class ServiceBootstrapper {
   }
 
   /// 安装服务依赖（从bundle复制配置文件 + npm install）
-  Future<({bool ok, String message})> _installService(String serviceName) async {
+  Future<({bool ok, String message})> _installService(
+    String serviceName,
+  ) async {
     final targetDir = Directory(serviceDir(serviceName));
     if (!targetDir.existsSync()) targetDir.createSync(recursive: true);
 
@@ -273,7 +298,10 @@ class ServiceBootstrapper {
 
     // 确认 package.json 存在
     if (!File(p.join(targetDir.path, 'package.json')).existsSync()) {
-      return (ok: false, message: '${_serviceDisplayName(serviceName)}的package.json缺失');
+      return (
+        ok: false,
+        message: '${_serviceDisplayName(serviceName)}的package.json缺失',
+      );
     }
 
     // 用自带的npm安装依赖
@@ -298,7 +326,8 @@ class ServiceBootstrapper {
       runInShell: Platform.isWindows, // Windows上npm.cmd需要shell执行
       environment: {
         ...Platform.environment,
-        'PATH': '${p.dirname(nodePath)}$pathSep${Platform.environment['PATH'] ?? ''}',
+        'PATH':
+            '${p.dirname(nodePath)}$pathSep${Platform.environment['PATH'] ?? ''}',
       },
     );
 
@@ -317,7 +346,8 @@ class ServiceBootstrapper {
     await for (final entity in src.list()) {
       final name = p.basename(entity.path);
       // 跳过大文件
-      if (name == 'node_modules' || name == 'node' || name == 'node.exe') continue;
+      if (name == 'node_modules' || name == 'node' || name == 'node.exe')
+        continue;
       if (name == 'package-lock.json') continue;
 
       if (entity is File) {
@@ -379,9 +409,12 @@ class ServiceBootstrapper {
 
   String _serviceDisplayName(String serviceName) {
     switch (serviceName) {
-      case 'wechat_service': return '微信服务';
-      case 'telegram_service': return 'Telegram服务';
-      default: return serviceName;
+      case 'wechat_service':
+        return '微信服务';
+      case 'telegram_service':
+        return 'Telegram服务';
+      default:
+        return serviceName;
     }
   }
 

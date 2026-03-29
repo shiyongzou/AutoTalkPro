@@ -47,7 +47,7 @@ class TelegramServiceManager {
   }
 
   TelegramServiceManager._({http.Client? httpClient})
-      : _client = httpClient ?? http.Client();
+    : _client = httpClient ?? http.Client();
 
   static TelegramServiceManager? _instance;
 
@@ -93,7 +93,10 @@ class TelegramServiceManager {
   }
 
   /// 启动TG本地服务
-  Future<({bool ok, String message})> start({String? apiId, String? apiHash}) async {
+  Future<({bool ok, String message})> start({
+    String? apiId,
+    String? apiHash,
+  }) async {
     // 总是杀掉旧进程重启——确保用最新的server.js和消息监听器
     if (await isRunning()) {
       stop();
@@ -102,7 +105,9 @@ class TelegramServiceManager {
     }
     // 自动引导环境
     if (!isReady) {
-      final boot = await ServiceBootstrapper.instance.bootstrapService('telegram_service');
+      final boot = await ServiceBootstrapper.instance.bootstrapService(
+        'telegram_service',
+      );
       if (!boot.ok) return (ok: false, message: boot.message);
     }
     if (!isReady) {
@@ -135,17 +140,26 @@ class TelegramServiceManager {
   }
 
   /// 发送验证码
-  Future<({bool ok, String? error, bool alreadyLoggedIn, TelegramUserInfo? user})> requestCode({
+  Future<
+    ({bool ok, String? error, bool alreadyLoggedIn, TelegramUserInfo? user})
+  >
+  requestCode({
     required String apiId,
     required String apiHash,
     required String phone,
   }) async {
     try {
-      final resp = await _client.post(
-        Uri.parse('$baseUrl/auth/request-code'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'apiId': apiId, 'apiHash': apiHash, 'phone': phone}),
-      ).timeout(const Duration(seconds: 30));
+      final resp = await _client
+          .post(
+            Uri.parse('$baseUrl/auth/request-code'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'apiId': apiId,
+              'apiHash': apiHash,
+              'phone': phone,
+            }),
+          )
+          .timeout(const Duration(seconds: 30));
 
       final body = jsonDecode(resp.body);
       if (resp.statusCode == 200 && body['success'] == true) {
@@ -155,30 +169,40 @@ class TelegramServiceManager {
             ok: true,
             error: null,
             alreadyLoggedIn: true,
-            user: u != null ? TelegramUserInfo(
-              id: u['id']?.toString(),
-              firstName: u['firstName']?.toString(),
-              username: u['username']?.toString(),
-              phone: u['phone']?.toString(),
-            ) : null,
+            user: u != null
+                ? TelegramUserInfo(
+                    id: u['id']?.toString(),
+                    firstName: u['firstName']?.toString(),
+                    username: u['username']?.toString(),
+                    phone: u['phone']?.toString(),
+                  )
+                : null,
           );
         }
         return (ok: true, error: null, alreadyLoggedIn: false, user: null);
       }
-      return (ok: false, error: body['error']?.toString() ?? '未知错误', alreadyLoggedIn: false, user: null);
+      return (
+        ok: false,
+        error: body['error']?.toString() ?? '未知错误',
+        alreadyLoggedIn: false,
+        user: null,
+      );
     } catch (e) {
       return (ok: false, error: '请求失败: $e', alreadyLoggedIn: false, user: null);
     }
   }
 
   /// 验证码校验
-  Future<({bool ok, String? error, bool needPassword, TelegramUserInfo? user})> verifyCode(String code) async {
+  Future<({bool ok, String? error, bool needPassword, TelegramUserInfo? user})>
+  verifyCode(String code) async {
     try {
-      final resp = await _client.post(
-        Uri.parse('$baseUrl/auth/verify-code'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'code': code}),
-      ).timeout(const Duration(seconds: 15));
+      final resp = await _client
+          .post(
+            Uri.parse('$baseUrl/auth/verify-code'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'code': code}),
+          )
+          .timeout(const Duration(seconds: 15));
 
       final body = jsonDecode(resp.body);
       if (body['needPassword'] == true) {
@@ -187,28 +211,42 @@ class TelegramServiceManager {
       if (resp.statusCode == 200 && body['success'] == true) {
         final u = body['user'] as Map<String, dynamic>?;
         return (
-          ok: true, error: null, needPassword: false,
-          user: u != null ? TelegramUserInfo(
-            id: u['id']?.toString(),
-            firstName: u['firstName']?.toString(),
-            username: u['username']?.toString(),
-          ) : null,
+          ok: true,
+          error: null,
+          needPassword: false,
+          user: u != null
+              ? TelegramUserInfo(
+                  id: u['id']?.toString(),
+                  firstName: u['firstName']?.toString(),
+                  username: u['username']?.toString(),
+                )
+              : null,
         );
       }
-      return (ok: false, error: body['error']?.toString() ?? '验证失败', needPassword: false, user: null);
+      return (
+        ok: false,
+        error: body['error']?.toString() ?? '验证失败',
+        needPassword: false,
+        user: null,
+      );
     } catch (e) {
       return (ok: false, error: '请求失败: $e', needPassword: false, user: null);
     }
   }
 
   /// 发消息
-  Future<bool> sendMessage({required String peerId, required String text}) async {
+  Future<bool> sendMessage({
+    required String peerId,
+    required String text,
+  }) async {
     try {
-      final resp = await _client.post(
-        Uri.parse('$baseUrl/send'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'peerId': peerId, 'text': text}),
-      ).timeout(const Duration(seconds: 10));
+      final resp = await _client
+          .post(
+            Uri.parse('$baseUrl/send'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'peerId': peerId, 'text': text}),
+          )
+          .timeout(const Duration(seconds: 10));
       final body = jsonDecode(resp.body);
       return body['success'] == true;
     } catch (_) {
@@ -225,17 +263,21 @@ class TelegramServiceManager {
       if (resp.statusCode != 200) return const [];
       final body = jsonDecode(resp.body);
       final list = body['messages'] as List? ?? [];
-      return list.map((m) => TelegramIncomingMessage(
-        id: m['id'] as int? ?? 0,
-        text: m['text'] as String? ?? '',
-        fromId: m['fromId']?.toString() ?? '',
-        fromName: m['fromName']?.toString() ?? '',
-        chatId: m['chatId']?.toString() ?? '',
-        chatName: m['chatName']?.toString() ?? '',
-        isPrivate: m['isPrivate'] as bool? ?? true,
-        isMentioned: m['isMentioned'] as bool? ?? false,
-        date: m['date'] as int? ?? 0,
-      )).toList();
+      return list
+          .map(
+            (m) => TelegramIncomingMessage(
+              id: m['id'] as int? ?? 0,
+              text: m['text'] as String? ?? '',
+              fromId: m['fromId']?.toString() ?? '',
+              fromName: m['fromName']?.toString() ?? '',
+              chatId: m['chatId']?.toString() ?? '',
+              chatName: m['chatName']?.toString() ?? '',
+              isPrivate: m['isPrivate'] as bool? ?? true,
+              isMentioned: m['isMentioned'] as bool? ?? false,
+              date: m['date'] as int? ?? 0,
+            ),
+          )
+          .toList();
     } catch (_) {
       return const [];
     }

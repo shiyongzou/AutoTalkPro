@@ -25,7 +25,11 @@ class PlatformUtils {
             final parts = line.trim().split(RegExp(r'\s+'));
             final pid = parts.last;
             if (pid.isNotEmpty && int.tryParse(pid) != null) {
-              await Process.run('taskkill', ['/F', '/PID', pid], runInShell: true);
+              await Process.run('taskkill', [
+                '/F',
+                '/PID',
+                pid,
+              ], runInShell: true);
             }
           }
         }

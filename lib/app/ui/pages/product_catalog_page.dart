@@ -28,12 +28,20 @@ class _ProductCatalogPageState extends State<ProductCatalogPage> {
 
   Future<void> _showProductForm({Product? existing}) async {
     final nameCtl = TextEditingController(text: existing?.name ?? '');
-    final categoryCtl = TextEditingController(text: existing?.category ?? '标准套餐');
+    final categoryCtl = TextEditingController(
+      text: existing?.category ?? '标准套餐',
+    );
     final descCtl = TextEditingController(text: existing?.description ?? '');
-    final basePriceCtl = TextEditingController(text: existing?.basePrice.toStringAsFixed(0) ?? '');
-    final floorPriceCtl = TextEditingController(text: existing?.floorPrice.toStringAsFixed(0) ?? '');
+    final basePriceCtl = TextEditingController(
+      text: existing?.basePrice.toStringAsFixed(0) ?? '',
+    );
+    final floorPriceCtl = TextEditingController(
+      text: existing?.floorPrice.toStringAsFixed(0) ?? '',
+    );
     final unitCtl = TextEditingController(text: existing?.unit ?? '月');
-    final featuresCtl = TextEditingController(text: existing?.features.join('、') ?? '');
+    final featuresCtl = TextEditingController(
+      text: existing?.features.join('、') ?? '',
+    );
 
     final result = await showDialog<bool>(
       context: context,
@@ -45,37 +53,92 @@ class _ProductCatalogPageState extends State<ProductCatalogPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(controller: nameCtl, decoration: const InputDecoration(labelText: '产品名称 *', border: OutlineInputBorder())),
+                TextField(
+                  controller: nameCtl,
+                  decoration: const InputDecoration(
+                    labelText: '产品名称 *',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
                 const SizedBox(height: 12),
-                TextField(controller: categoryCtl, decoration: const InputDecoration(labelText: '类目', border: OutlineInputBorder())),
+                TextField(
+                  controller: categoryCtl,
+                  decoration: const InputDecoration(
+                    labelText: '类目',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
                 const SizedBox(height: 12),
-                TextField(controller: descCtl, decoration: const InputDecoration(labelText: '描述', border: OutlineInputBorder()), maxLines: 2),
+                TextField(
+                  controller: descCtl,
+                  decoration: const InputDecoration(
+                    labelText: '描述',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 2,
+                ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Expanded(child: TextField(controller: basePriceCtl, decoration: const InputDecoration(labelText: '基准价 *', border: OutlineInputBorder()), keyboardType: TextInputType.number)),
+                    Expanded(
+                      child: TextField(
+                        controller: basePriceCtl,
+                        decoration: const InputDecoration(
+                          labelText: '基准价 *',
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
                     const SizedBox(width: 12),
-                    Expanded(child: TextField(controller: floorPriceCtl, decoration: const InputDecoration(labelText: '底价 *', border: OutlineInputBorder()), keyboardType: TextInputType.number)),
+                    Expanded(
+                      child: TextField(
+                        controller: floorPriceCtl,
+                        decoration: const InputDecoration(
+                          labelText: '底价 *',
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
                     const SizedBox(width: 12),
-                    SizedBox(width: 80, child: TextField(controller: unitCtl, decoration: const InputDecoration(labelText: '单位', border: OutlineInputBorder()))),
+                    SizedBox(
+                      width: 80,
+                      child: TextField(
+                        controller: unitCtl,
+                        decoration: const InputDecoration(
+                          labelText: '单位',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                TextField(controller: featuresCtl, decoration: const InputDecoration(labelText: '功能亮点(顿号分隔)', border: OutlineInputBorder())),
+                TextField(
+                  controller: featuresCtl,
+                  decoration: const InputDecoration(
+                    labelText: '功能亮点(顿号分隔)',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
               ],
             ),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('取消')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('取消'),
+          ),
           FilledButton(
             onPressed: () {
               if (nameCtl.text.trim().isEmpty ||
                   basePriceCtl.text.trim().isEmpty ||
                   floorPriceCtl.text.trim().isEmpty) {
-                ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(content: Text('名称、基准价和底价为必填项')),
-                );
+                ScaffoldMessenger.of(
+                  ctx,
+                ).showSnackBar(const SnackBar(content: Text('名称、基准价和底价为必填项')));
                 return;
               }
               Navigator.pop(ctx, true);
@@ -89,7 +152,12 @@ class _ProductCatalogPageState extends State<ProductCatalogPage> {
     if (result != true) return;
 
     final now = DateTime.now();
-    final features = featuresCtl.text.trim().split(RegExp(r'[、,，]')).where((s) => s.trim().isNotEmpty).map((s) => s.trim()).toList();
+    final features = featuresCtl.text
+        .trim()
+        .split(RegExp(r'[、,，]'))
+        .where((s) => s.trim().isNotEmpty)
+        .map((s) => s.trim())
+        .toList();
     final product = Product(
       id: existing?.id ?? 'prod_${now.microsecondsSinceEpoch}',
       name: nameCtl.text.trim(),
@@ -112,7 +180,9 @@ class _ProductCatalogPageState extends State<ProductCatalogPage> {
     final prods = await widget.appContext.productRepository.listProducts();
     final rMap = <String, List<PriceRule>>{};
     for (final p in prods) {
-      rMap[p.id] = await widget.appContext.productRepository.getRulesForProduct(p.id);
+      rMap[p.id] = await widget.appContext.productRepository.getRulesForProduct(
+        p.id,
+      );
     }
     if (!mounted) return;
     setState(() {
@@ -139,16 +209,14 @@ class _ProductCatalogPageState extends State<ProductCatalogPage> {
             children: [
               SizedBox(
                 width: 140,
-                child: AppMetricTile(
-                  label: '产品数',
-                  value: '${products.length}',
-                ),
+                child: AppMetricTile(label: '产品数', value: '${products.length}'),
               ),
               SizedBox(
                 width: 140,
                 child: AppMetricTile(
                   label: '价格规则',
-                  value: '${rulesMap.values.fold<int>(0, (s, l) => s + l.length)}',
+                  value:
+                      '${rulesMap.values.fold<int>(0, (s, l) => s + l.length)}',
                 ),
               ),
             ],
@@ -233,11 +301,17 @@ class _ProductCard extends StatelessWidget {
                       children: [
                         Text(
                           product.name,
-                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
                         ),
                         Text(
                           product.description,
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -275,12 +349,16 @@ class _ProductCard extends StatelessWidget {
               Wrap(
                 spacing: 6,
                 runSpacing: 4,
-                children: product.features.map((f) => Chip(
-                  label: Text(f, style: const TextStyle(fontSize: 10)),
-                  padding: EdgeInsets.zero,
-                  visualDensity: VisualDensity.compact,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                )).toList(),
+                children: product.features
+                    .map(
+                      (f) => Chip(
+                        label: Text(f, style: const TextStyle(fontSize: 10)),
+                        padding: EdgeInsets.zero,
+                        visualDensity: VisualDensity.compact,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    )
+                    .toList(),
               ),
               if (isExpanded && rules.isNotEmpty) ...[
                 SizedBox(height: tokens.spaceMd),
@@ -295,36 +373,44 @@ class _ProductCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: tokens.spaceSm),
-                ...rules.map((r) => Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(r.ruleName, style: const TextStyle(fontSize: 12)),
-                      ),
-                      AppStatusTag(
-                        label: '-${r.discountPercent.toStringAsFixed(0)}%',
-                        tone: AppStatusTone.success,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${r.minQuantity}-${r.maxQuantity}${product.unit}',
-                        style: const TextStyle(fontSize: 11, color: Colors.grey),
-                      ),
-                      const SizedBox(width: 8),
-                      if (r.requiresApproval)
+                ...rules.map(
+                  (r) => Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            r.ruleName,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
                         AppStatusTag(
-                          label: '需${r.approvalLevel}审批',
-                          tone: AppStatusTone.warning,
-                        )
-                      else
-                        const AppStatusTag(
-                          label: '自动',
+                          label: '-${r.discountPercent.toStringAsFixed(0)}%',
                           tone: AppStatusTone.success,
                         ),
-                    ],
+                        const SizedBox(width: 8),
+                        Text(
+                          '${r.minQuantity}-${r.maxQuantity}${product.unit}',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        if (r.requiresApproval)
+                          AppStatusTag(
+                            label: '需${r.approvalLevel}审批',
+                            tone: AppStatusTone.warning,
+                          )
+                        else
+                          const AppStatusTag(
+                            label: '自动',
+                            tone: AppStatusTone.success,
+                          ),
+                      ],
+                    ),
                   ),
-                )),
+                ),
               ],
             ],
           ),
