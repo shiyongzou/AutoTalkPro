@@ -189,7 +189,7 @@ class MessageBridge {
           }
         }
         // 长消息分段发送（微信单条有长度限制）
-        final segments = _splitMessage(finalReply, 500);
+        final segments = _splitMessage(finalReply, 2000);
         // ignore: avoid_print
         print(
           '[MessageBridge] 发送回复: adapter=${adapter.runtimeType} peerId=${raw.peerId} segments=${segments.length} totalLen=${finalReply.length}',
