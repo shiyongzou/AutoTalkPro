@@ -33,12 +33,12 @@ class PlatformUtils {
     } catch (_) {}
   }
 
-  /// 获取临时文件路径
+  /// 获取临时文件路径（跨平台）
   static String tempFilePath(String name) {
     if (Platform.isWindows) {
       return p.join(Platform.environment['TEMP'] ?? r'C:\Temp', name);
     }
-    return '/tmp/$name';
+    return p.join('/tmp', name);
   }
 
   /// 获取app bundle内的种子文件目录（只含 package.json / server.js 等小文件）

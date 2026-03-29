@@ -16,13 +16,17 @@ class ServiceBootstrapper {
   /// 缓存根目录
   static String get _cacheRoot {
     if (Platform.isMacOS) {
-      final home = Platform.environment['HOME'] ?? '/tmp';
+      final home = Platform.environment['HOME'] ??
+          Platform.environment['USERPROFILE'] ??
+          Directory.current.path;
       return p.join(home, 'Library', 'Application Support', 'AutoTalk Pro', 'services');
     } else if (Platform.isWindows) {
-      final appData = Platform.environment['APPDATA'] ?? r'C:\Users\Public';
+      final appData = Platform.environment['APPDATA'] ??
+          Platform.environment['USERPROFILE'] ??
+          r'C:\Users\Public';
       return p.join(appData, 'AutoTalk Pro', 'services');
     } else {
-      final home = Platform.environment['HOME'] ?? '/tmp';
+      final home = Platform.environment['HOME'] ?? Directory.current.path;
       return p.join(home, '.autotalk-pro', 'services');
     }
   }
@@ -324,23 +328,34 @@ class ServiceBootstrapper {
     }
   }
 
-  /// 移动目录（rename 可能跨分区失败，用 rsync 兜底）
+  /// 移动目录（rename 可能跨分区失败，用 Dart API 复制兜底）
   Future<void> _moveDirectory(String src, String dest) async {
     try {
       Directory(src).renameSync(dest);
     } catch (_) {
-      // rename失败（跨分区），用cp
-      if (Platform.isWindows) {
-        await Process.run('xcopy', [src, dest, '/E', '/I', '/H', '/Y'], runInShell: true);
-      } else {
-        await Process.run('cp', ['-R', src, dest]);
-      }
+      // rename 失败（跨分区），用纯 Dart 递归复制
+      await _copyDirectoryRecursive(Directory(src), Directory(dest));
       Directory(src).deleteSync(recursive: true);
+    }
+  }
+
+  /// 纯 Dart 递归复制目录（跨平台，不依赖 shell 命令）
+  Future<void> _copyDirectoryRecursive(Directory src, Directory dest) async {
+    if (!dest.existsSync()) dest.createSync(recursive: true);
+    await for (final entity in src.list()) {
+      final newPath = p.join(dest.path, p.basename(entity.path));
+      if (entity is File) {
+        entity.copySync(newPath);
+      } else if (entity is Directory) {
+        await _copyDirectoryRecursive(entity, Directory(newPath));
+      }
     }
   }
 
   /// 获取CPU架构
   String _getArch() {
+    // Windows 目前只提供 x64 Node.js 下载
+    if (Platform.isWindows) return 'x64';
     try {
       final result = Process.runSync('uname', ['-m']);
       final arch = result.stdout.toString().trim();
