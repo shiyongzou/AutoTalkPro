@@ -16,10 +16,21 @@ jobs:
           flutter-version: '3.41.6'
       - run: flutter pub get
       - run: flutter build macos --release
+      - name: Generate tutorial PDF
+        run: |
+          pip3 install --break-system-packages weasyprint
+          pandoc docs/tutorial.md -f markdown -t html5 --standalone --metadata title="AutoTalk Pro 新手入门教程" -o /tmp/tutorial.html
+          python3 -c "
+          html = open('/tmp/tutorial.html').read()
+          css = '<style>body{font-family:system-ui,sans-serif;max-width:800px;margin:0 auto;padding:40px;line-height:1.8;color:#333}h1{border-bottom:2px solid #e94560;padding-bottom:10px}h2{margin-top:40px;border-bottom:1px solid #ddd;padding-bottom:8px}table{border-collapse:collapse;width:100%;margin:16px 0}th,td{border:1px solid #ddd;padding:8px 12px;text-align:left}th{background:#f5f5f5}code{background:#f0f0f0;padding:2px 6px;border-radius:3px}blockquote{border-left:4px solid #e94560;margin:16px 0;padding:8px 16px;background:#fff5f5}hr{border:none;border-top:1px solid #eee;margin:30px 0}</style>'
+          html = html.replace('</head>', css + '</head>')
+          open('/tmp/tutorial.html','w').write(html)
+          "
+          python3 -c "import weasyprint; weasyprint.HTML('/tmp/tutorial.html').write_pdf('build/macos/Build/Products/Release/新手教程.pdf')"
       - name: Package
         run: |
           cd build/macos/Build/Products/Release
-          zip -r "$GITHUB_WORKSPACE/AutoTalkPro-macOS.zip" "Auto Talk Pro.app"
+          zip -r "$GITHUB_WORKSPACE/AutoTalkPro-macOS.zip" "Auto Talk Pro.app" "新手教程.pdf"
       - uses: actions/upload-artifact@v4
         with:
           name: AutoTalkPro-macOS
@@ -34,6 +45,18 @@ jobs:
           flutter-version: '3.41.6'
       - run: flutter pub get
       - run: flutter build windows --release
+      - name: Generate tutorial PDF
+        shell: bash
+        run: |
+          pip install weasyprint
+          pandoc docs/tutorial.md -f markdown -t html5 --standalone --metadata title="AutoTalk Pro 新手入门教程" -o tutorial.html
+          python -c "
+          html = open('tutorial.html', encoding='utf-8').read()
+          css = '<style>body{font-family:Microsoft YaHei,sans-serif;max-width:800px;margin:0 auto;padding:40px;line-height:1.8;color:#333}h1{border-bottom:2px solid #e94560;padding-bottom:10px}h2{margin-top:40px;border-bottom:1px solid #ddd;padding-bottom:8px}table{border-collapse:collapse;width:100%;margin:16px 0}th,td{border:1px solid #ddd;padding:8px 12px;text-align:left}th{background:#f5f5f5}code{background:#f0f0f0;padding:2px 6px;border-radius:3px}blockquote{border-left:4px solid #e94560;margin:16px 0;padding:8px 16px;background:#fff5f5}hr{border:none;border-top:1px solid #eee;margin:30px 0}</style>'
+          html = html.replace('</head>', css + '</head>')
+          open('tutorial.html','w', encoding='utf-8').write(html)
+          "
+          python -c "import weasyprint; weasyprint.HTML('tutorial.html').write_pdf('build/windows/x64/runner/Release/新手教程.pdf')"
       - name: Package
         shell: pwsh
         run: |
