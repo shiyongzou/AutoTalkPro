@@ -99,7 +99,8 @@ jobs:
               \"tag_name\": \"${TAG_NAME}\",
               \"name\": \"${TAG_NAME}\",
               \"body\": \"AutoTalk Pro ${TAG_NAME}\\n\\n- macOS (Intel/Apple Silicon)\\n- Windows x64\\n\\n📖 [新手教程](https://gitee.com/zoushiyong_admin/AutoTalkPro/blob/main/docs/tutorial.md)\",
-              \"prerelease\": false
+              \"prerelease\": false,
+              \"target_commitish\": \"main\"
             }" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))")
 
           echo "Gitee Release ID: $RELEASE_ID"
