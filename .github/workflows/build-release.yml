@@ -8,12 +8,21 @@ on:
 
 jobs:
   build-macos:
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.41.6'
+      - name: Fix DNS for CocoaPods downloads
+        run: |
+          echo "nameserver 8.8.8.8" | sudo tee /etc/resolver/sqlite.org
+          echo "nameserver 1.1.1.1" | sudo tee -a /etc/resolver/sqlite.org
+          # Pre-resolve and add to hosts as fallback
+          IP=$(dig +short www.sqlite.org @8.8.8.8 | head -1)
+          if [ -n "$IP" ]; then
+            echo "$IP www.sqlite.org" | sudo tee -a /etc/hosts
+          fi
       - run: flutter pub get
       - run: flutter build macos --release
       - name: Package
