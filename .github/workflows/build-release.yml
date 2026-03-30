@@ -57,6 +57,16 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Sync to Gitee
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        if: env.GITEE_TOKEN != ''
+        run: |
+          git remote add gitee https://zoushiyong_admin:${GITEE_TOKEN}@gitee.com/zoushiyong_admin/AutoTalkPro.git || true
+          git push gitee main --force --tags
       - uses: actions/download-artifact@v4
         with:
           path: artifacts

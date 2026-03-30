@@ -1,0 +1,20 @@
+name: Sync to Gitee
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Push to Gitee
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        if: env.GITEE_TOKEN != ''
+        run: |
+          git remote add gitee https://zoushiyong_admin:${GITEE_TOKEN}@gitee.com/zoushiyong_admin/AutoTalkPro.git || true
+          git push gitee main --force --tags
