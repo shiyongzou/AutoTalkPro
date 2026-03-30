@@ -86,10 +86,10 @@ jobs:
 
       # Gitee Release（国内下载）
       - name: Create Gitee Release
-        if: ${{ secrets.GITEE_TOKEN != '' }}
         env:
           GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
           TAG_NAME: ${{ github.ref_name }}
+        if: env.GITEE_TOKEN != ''
         run: |
           # 创建 Gitee Release
           RELEASE_ID=$(curl -s -X POST "https://gitee.com/api/v5/repos/zoushiyong_admin/AutoTalkPro/releases" \
